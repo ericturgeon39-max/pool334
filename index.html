@@ -1350,6 +1350,64 @@ function buildBreakdown(r) {
   .admin-panel { width: calc(100vw - 32px); left: 16px; }
   .admin-toggle { left: 16px; bottom: 16px; }
 }
+
+/* ── CLASSEMENT PAR POINTS — Breakdown détail joueurs ── */
+.standings-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.standings-table thead { background: #f8fafc; }
+.standings-table th {
+  padding: 12px 14px; text-align: center; font-size: 11px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase; color: #94a3b8;
+  border-bottom: 2px solid #e2e8f0; white-space: nowrap;
+}
+.standings-table th.left { text-align: left; }
+.standings-table td { padding: 13px 14px; border-bottom: 1px solid #f1f5f9; text-align: center; vertical-align: middle; }
+.standings-table td.left { text-align: left; }
+.standings-table tbody tr:not(.breakdown-panel) { cursor: pointer; transition: background 0.15s; }
+.standings-table tbody tr:not(.breakdown-panel):hover td { background: #f0f7ff; }
+
+.rank-cell { font-size: 20px; font-weight: 900; color: #cbd5e1; min-width: 36px; display:inline-block; }
+.rank-cell.r1 { color: #f59e0b; }
+.rank-cell.r2 { color: #94a3b8; }
+.rank-cell.r3 { color: #b45309; }
+
+.participant-cell { display: flex; flex-direction: column; }
+.p-name { font-weight: 700; font-size: 15px; color: #1e293b; }
+.p-nhl { font-size: 11px; color: #94a3b8; font-weight: 500; margin-top: 1px; }
+
+.pts-cell { font-size: 18px; font-weight: 800; color: #1e40af; }
+.stat-cell { font-size: 14px; font-weight: 600; color: #334155; }
+.diff-cell { font-size: 13px; font-weight: 700; }
+.diff-cell.neg { color: #dc2626; }
+.diff-cell.zero { color: #16a34a; }
+.pj-cell, .ppj-cell { font-size: 13px; color: #64748b; }
+
+.breakdown-panel { display: none; background: #f8fafc; }
+.breakdown-panel.open { display: table-row; }
+.breakdown-panel td { text-align: left; cursor: default; }
+.breakdown-inner { padding: 16px 20px; }
+.breakdown-title {
+  font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  color: #2563eb; margin-bottom: 12px; margin-top: 18px;
+}
+.breakdown-title:first-child { margin-top: 0; }
+.player-rows {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.player-row {
+  background: #fff; border: 1px solid #e2e8f0; border-radius: 8px;
+  padding: 8px 12px; display: flex; justify-content: space-between; align-items: center;
+}
+.player-row.best { border-color: #93c5fd; background: #eff6ff; }
+.pr-name { font-size: 12px; font-weight: 600; color: #1e293b; display: flex; align-items: center; }
+.pr-pts { font-size: 14px; font-weight: 800; color: #1e40af; flex-shrink: 0; margin-left: 8px; }
+.pr-detail { font-size: 10px; color: #94a3b8; margin-top: 2px; }
+.pos-label {
+  font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px;
+  margin-right: 6px; flex-shrink: 0;
+}
 </style>
 
 <!-- ═══════════════════════════════════════════════════════════
