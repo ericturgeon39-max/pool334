@@ -244,6 +244,8 @@
     <button class="nav-tab active" onclick="showTab('vue-ensemble')">Vue d'ensemble</button>
     <button class="nav-tab" onclick="showTab('equipes')">Équipes</button>
     <button class="nav-tab" onclick="showTab('classement')">Classement</button>
+    <button class="nav-tab" onclick="showTab('recrues-prises')">Recrues repêchées</button>
+    <button class="nav-tab" onclick="showTab('joueurs-pris')">Joueurs signés</button>
     <button class="nav-tab" onclick="showTab('reglements')">Règlements</button>
   </div>
 </nav>
@@ -324,6 +326,51 @@
     </details>
 
   </div>
+  <div id="tab-recrues-prises" class="tab-content" style="display:none">
+    <div class="section-title">🔒 Recrues repêchées (par ordre alphabétique)</div>
+    <div style="margin-bottom:16px">
+      <input type="text" id="recrues-search" placeholder="🔍 Rechercher une recrue..." 
+        style="width:100%;max-width:400px;padding:10px 14px;border:1px solid #e2e8f0;border-radius:10px;font-size:14px;outline:none;color:#1e293b"
+        oninput="filterAvailabilityList('recrues')">
+    </div>
+    <div class="standings-wrap" style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.04)">
+      <table class="standings-table" style="width:100%">
+        <thead>
+          <tr>
+            <th class="left">Nom</th>
+            <th>Pos.</th>
+            <th>Année</th>
+            <th>Équipe NHL</th>
+            <th class="left">Appartient à</th>
+          </tr>
+        </thead>
+        <tbody id="recrues-prises-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="tab-joueurs-pris" class="tab-content" style="display:none">
+    <div class="section-title">🔒 Joueurs signés (par ordre alphabétique)</div>
+    <div style="margin-bottom:16px">
+      <input type="text" id="joueurs-search" placeholder="🔍 Rechercher un joueur..." 
+        style="width:100%;max-width:400px;padding:10px 14px;border:1px solid #e2e8f0;border-radius:10px;font-size:14px;outline:none;color:#1e293b"
+        oninput="filterAvailabilityList('joueurs')">
+    </div>
+    <div class="standings-wrap" style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.04)">
+      <table class="standings-table" style="width:100%">
+        <thead>
+          <tr>
+            <th class="left">Nom</th>
+            <th>Pos.</th>
+            <th>Salaire</th>
+            <th class="left">Appartient à</th>
+          </tr>
+        </thead>
+        <tbody id="joueurs-pris-body"></tbody>
+      </table>
+    </div>
+  </div>
+
   <div id="tab-reglements" class="tab-content" style="display:none">
     <div class="rules-grid">
       <div class="rule-card"><div class="rule-icon">🟢</div><div class="rule-title">Composition de l'équipe</div><div class="rule-item"><div class="rule-dot"></div><div>1 franchise LNH par DG</div></div><div class="rule-item"><div class="rule-dot"></div><div>Min. 16 joueurs : 1 G, 6 D, 9 A</div></div><div class="rule-item"><div class="rule-dot"></div><div>Max. 25 recrues — repêchées dans les 5 dernières années</div></div><div class="rule-item"><div class="rule-dot"></div><div>Points: But/Passe = 1pt, Victoire G = 2pts, Blanchissage +3pts</div></div><div class="rule-item"><div class="rule-dot"></div><div>Seuls les 9A, 6D et 1G comptent au total</div></div></div>
@@ -438,6 +485,7 @@ window.updateSalary = function() {
   buildOverviewCards('teams-overview');
   buildOverviewCards('teams-list-nav');
   buildSalaryStandings();
+  buildJoueursPrisList();
   populatePlayerSelect(); // refresh dropdown labels
 
   document.getElementById('admin-status').textContent = `✅ ${playerName} mis à jour!`;
@@ -511,6 +559,96 @@ function buildTeamDetail(idx){
   return html;
 }
 
+// ─── LISTES DE DISPONIBILITÉ (recrues prises / joueurs pris) ──────────────
+
+function buildRecruesPrisesList() {
+  const rows = [];
+  teams.forEach(t => {
+    (t.prospects || []).forEach(p => {
+      rows.push({ name: p.name, pos: p.pos, year: p.year, nhlTeam: p.team, owner: t.dg, ownerNhl: t.nhl });
+    });
+  });
+  rows.sort((a, b) => a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' }));
+
+  const tbody = document.getElementById('recrues-prises-body');
+  if (!tbody) return;
+  tbody.innerHTML = rows.map(r => `
+    <tr>
+      <td class="left player-name">${r.name}</td>
+      <td><span class="pos-badge pos-${r.pos}">${r.pos}</span></td>
+      <td class="stat-cell">${r.year}</td>
+      <td class="stat-cell">${r.nhlTeam}</td>
+      <td class="left"><span style="font-weight:700;color:#1e293b">${r.owner}</span> <span style="color:#94a3b8;font-size:12px">(${r.ownerNhl})</span></td>
+    </tr>
+  `).join('');
+
+  tbody.dataset.allRows = JSON.stringify(rows);
+}
+
+function buildJoueursPrisList() {
+  const rows = [];
+  teams.forEach(t => {
+    ['G','D','A'].forEach(pos => {
+      (t.roster[pos] || []).forEach(p => {
+        rows.push({ name: p.name, pos, salary: p.salary, owner: t.dg, ownerNhl: t.nhl });
+      });
+    });
+  });
+  rows.sort((a, b) => a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' }));
+
+  const tbody = document.getElementById('joueurs-pris-body');
+  if (!tbody) return;
+  tbody.innerHTML = rows.map(r => {
+    const salStr = typeof r.salary === 'string' ? r.salary : fmt(r.salary);
+    const salClass = r.salary === 'RFA' ? 'rfa' : r.salary === 'UFA' ? 'ufa' : '';
+    return `
+    <tr>
+      <td class="left player-name">${r.name}</td>
+      <td><span class="pos-badge pos-${r.pos}">${r.pos}</span></td>
+      <td><span class="salary-tag ${salClass}">${salStr}</span></td>
+      <td class="left"><span style="font-weight:700;color:#1e293b">${r.owner}</span> <span style="color:#94a3b8;font-size:12px">(${r.ownerNhl})</span></td>
+    </tr>`;
+  }).join('');
+
+  tbody.dataset.allRows = JSON.stringify(rows);
+}
+
+window.filterAvailabilityList = function(type) {
+  const isRecrues = type === 'recrues';
+  const searchInput = document.getElementById(isRecrues ? 'recrues-search' : 'joueurs-search');
+  const tbody = document.getElementById(isRecrues ? 'recrues-prises-body' : 'joueurs-pris-body');
+  const query = searchInput.value.trim().toLowerCase();
+  const allRows = JSON.parse(tbody.dataset.allRows || '[]');
+
+  const filtered = query
+    ? allRows.filter(r => r.name.toLowerCase().includes(query) || r.owner.toLowerCase().includes(query) || r.ownerNhl.toLowerCase().includes(query))
+    : allRows;
+
+  if (isRecrues) {
+    tbody.innerHTML = filtered.map(r => `
+      <tr>
+        <td class="left player-name">${r.name}</td>
+        <td><span class="pos-badge pos-${r.pos}">${r.pos}</span></td>
+        <td class="stat-cell">${r.year}</td>
+        <td class="stat-cell">${r.nhlTeam}</td>
+        <td class="left"><span style="font-weight:700;color:#1e293b">${r.owner}</span> <span style="color:#94a3b8;font-size:12px">(${r.ownerNhl})</span></td>
+      </tr>
+    `).join('') || '<tr><td colspan="5" style="text-align:center;padding:24px;color:#94a3b8">Aucun résultat</td></tr>';
+  } else {
+    tbody.innerHTML = filtered.map(r => {
+      const salStr = typeof r.salary === 'string' ? r.salary : fmt(r.salary);
+      const salClass = r.salary === 'RFA' ? 'rfa' : r.salary === 'UFA' ? 'ufa' : '';
+      return `
+      <tr>
+        <td class="left player-name">${r.name}</td>
+        <td><span class="pos-badge pos-${r.pos}">${r.pos}</span></td>
+        <td><span class="salary-tag ${salClass}">${salStr}</span></td>
+        <td class="left"><span style="font-weight:700;color:#1e293b">${r.owner}</span> <span style="color:#94a3b8;font-size:12px">(${r.ownerNhl})</span></td>
+      </tr>`;
+    }).join('') || '<tr><td colspan="4" style="text-align:center;padding:24px;color:#94a3b8">Aucun résultat</td></tr>';
+  }
+};
+
 function buildSalaryStandings(){
   const sorted=[...teams].sort((a,b)=>a.masse-b.masse);
   const tbody=document.getElementById('salary-standings-body'); if(!tbody) return; tbody.innerHTML='';
@@ -527,7 +665,7 @@ function showTab(id){
   document.querySelectorAll('.tab-content').forEach(el=>el.style.display='none');
   document.querySelectorAll('.nav-tab').forEach(btn=>btn.classList.remove('active'));
   document.getElementById('tab-'+id).style.display='block';
-  const tabs=['vue-ensemble','equipes','classement','reglements'];
+  const tabs=['vue-ensemble','equipes','classement','recrues-prises','joueurs-pris','reglements'];
   document.querySelectorAll('.nav-tab')[tabs.indexOf(id)].classList.add('active');
   if(id==='equipes'){document.getElementById('team-list-view').style.display='grid';document.getElementById('team-detail-container').innerHTML='';document.getElementById('team-detail-container').style.display='none';}
   if(id==='classement' && !window.__ptsLoadedOnce){ window.__ptsLoadedOnce = true; loadAllPlayerStats(); }
@@ -538,6 +676,8 @@ populateTeamSelect();
 buildOverviewCards('teams-overview');
 buildOverviewCards('teams-list-nav');
 buildSalaryStandings();
+buildRecruesPrisesList();
+buildJoueursPrisList();
 
 // ═══════════════════════════════════════════════════════════
 // CLASSEMENT PAR POINTS — Stats NHL en direct (API LNH)
