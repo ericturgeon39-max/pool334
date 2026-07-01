@@ -278,6 +278,7 @@
         <div style="font-size:12px;color:#334155">Attaquants / Défenseurs : <span style="font-weight:800;color:#2563eb">But = 1pt · Passe = 1pt</span></div>
         <div style="font-size:12px;color:#334155">Gardien : <span style="font-weight:800;color:#2563eb">Victoire = 2pts · Blanchissage = 3pts · But/Passe = 1pt</span></div>
         <div style="font-size:12px;color:#334155">Comptabilisés : <span style="font-weight:800;color:#2563eb">9 meilleurs A + 6 meilleurs D + 1 meilleur G</span></div>
+        <div style="font-size:12px;color:#334155">Bonus équipe : <span style="font-weight:800;color:#2563eb">Points de la franchise LNH du DG au classement réel s'ajoutent au total</span></div>
       </div>
     </div>
 
@@ -300,13 +301,15 @@
             <th title="Parties jouées (moyenne équipe)">PJ</th>
             <th title="Buts comptabilisés">B</th>
             <th title="Points comptabilisés">P</th>
-            <th title="Points pool total">PPts</th>
-            <th title="PPts par partie jouée">PPts/PJ</th>
+            <th title="Points du pool (joueurs comptabilisés)">Pts joueurs</th>
+            <th title="Points au classement réel de la LNH de l'équipe du DG">Pts LNH</th>
+            <th title="Pts joueurs + Pts LNH">Total</th>
+            <th title="Total par partie jouée">Total/PJ</th>
             <th title="Différence avec le 1er">Diff. 1er</th>
           </tr>
         </thead>
         <tbody id="pts-standings-body">
-          <tr><td colspan="8" style="padding:40px;text-align:center;color:#94a3b8">⏳ Chargement des statistiques depuis l'API LNH…</td></tr>
+          <tr><td colspan="10" style="padding:40px;text-align:center;color:#94a3b8">⏳ Chargement des statistiques depuis l'API LNH…</td></tr>
         </tbody>
       </table>
     </div>
@@ -1145,6 +1148,29 @@ function calcTeamScore(playerStats) {
   return { total, goals, points, avgGP, topG, topD, topA, gPts, dPts, aPts };
 }
 
+// ─── POINTS RÉELS DES ÉQUIPES LNH (classement général) ──────────────────────
+// Date choisie: fin de la saison régulière 2025-26 (dernière saison complétée),
+// pour obtenir le classement final (points) de chaque franchise LNH.
+const STANDINGS_DATE = "2026-04-17";
+let nhlTeamPoints = {};
+
+async function fetchNHLTeamPoints() {
+  try {
+    const url = `https://api-web.nhle.com/v1/standings/${STANDINGS_DATE}`;
+    const res = await fetch(CORS_PROXY + encodeURIComponent(url));
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const map = {};
+    (data.standings || []).forEach(t => {
+      const name = t.teamName?.default;
+      if (name) map[name] = t.points;
+    });
+    return map;
+  } catch (e) {
+    return {};
+  }
+}
+
 let allResults = [];
 
 async function loadAllPlayerStats() {
@@ -1155,7 +1181,10 @@ async function loadAllPlayerStats() {
   spinnerEl.style.display = 'block';
 
   const tbody = document.getElementById("pts-standings-body");
-  tbody.innerHTML = '<tr class="loading-row"><td colspan="8">⏳ Chargement des statistiques depuis l\'API LNH…</td></tr>';
+  tbody.innerHTML = '<tr class="loading-row"><td colspan="10">⏳ Chargement des statistiques depuis l\'API LNH…</td></tr>';
+
+  statusText.textContent = `Chargement du classement LNH…`;
+  nhlTeamPoints = await fetchNHLTeamPoints();
 
   let loaded = 0;
   const total = PTS_TEAMS.reduce((s,t) => s + t.players.length, 0);
@@ -1175,10 +1204,12 @@ async function loadAllPlayerStats() {
       loaded++;
     }
     const score = calcTeamScore(playerStats);
+    score.nhlPts = nhlTeamPoints[team.nhl] ?? 0;
+    score.combined = score.total + score.nhlPts;
     allResults.push({ team, playerStats, score });
   }
 
-  allResults.sort((a,b) => b.score.total - a.score.total);
+  allResults.sort((a,b) => b.score.combined - a.score.combined);
   renderStandings();
 
   spinnerEl.style.display = 'none';
@@ -1191,12 +1222,12 @@ async function loadAllPlayerStats() {
 function renderStandings() {
   const tbody = document.getElementById("pts-standings-body");
   tbody.innerHTML = '';
-  const top = allResults[0]?.score.total || 0;
+  const top = allResults[0]?.score.combined || 0;
 
   allResults.forEach((r, i) => {
     const rank = i + 1;
-    const diff = r.score.total - top;
-    const ppj = r.score.avgGP > 0 ? (r.score.total / r.score.avgGP).toFixed(2) : '—';
+    const diff = r.score.combined - top;
+    const ppj = r.score.avgGP > 0 ? (r.score.combined / r.score.avgGP).toFixed(2) : '—';
     const rankClass = rank === 1 ? 'r1' : rank === 2 ? 'r2' : rank === 3 ? 'r3' : '';
 
     const tr = document.createElement('tr');
@@ -1211,7 +1242,9 @@ function renderStandings() {
       <td class="pj-cell">${r.score.avgGP}</td>
       <td class="stat-cell">${r.score.goals}</td>
       <td class="stat-cell">${r.score.points}</td>
-      <td class="pts-cell">${r.score.total}</td>
+      <td class="stat-cell">${r.score.total}</td>
+      <td class="stat-cell">${r.score.nhlPts}</td>
+      <td class="pts-cell">${r.score.combined}</td>
       <td class="ppj-cell">${ppj}</td>
       <td class="diff-cell ${rank === 1 ? 'zero' : 'neg'}">${rank === 1 ? '—' : diff}</td>
     `;
@@ -1223,7 +1256,7 @@ function renderStandings() {
     btr.className = 'breakdown-panel';
     btr.id = `breakdown-${i}`;
     const btd = document.createElement('td');
-    btd.colSpan = 8;
+    btd.colSpan = 10;
     btd.innerHTML = buildBreakdown(r);
     btr.appendChild(btd);
     tbody.appendChild(btr);
@@ -1278,8 +1311,8 @@ function buildBreakdown(r) {
 <style>
 /* ── TICKER ── */
 .ticker-wrap {
-  background: #1e40af;
-  border-bottom: 2px solid #93c5fd;
+  background: #0f172a;
+  border-bottom: 2px solid #2563eb;
   overflow: hidden;
   padding: 0;
   position: relative;
@@ -1288,7 +1321,7 @@ function buildBreakdown(r) {
   align-items: center;
 }
 .ticker-label {
-  background: #1d4ed8;
+  background: #111827;
   color: #fff;
   font-size: 11px;
   font-weight: 800;
@@ -1301,7 +1334,7 @@ function buildBreakdown(r) {
   white-space: nowrap;
   z-index: 2;
   flex-shrink: 0;
-  border-right: 2px solid #93c5fd;
+  border-right: 2px solid #2563eb;
 }
 .ticker-track {
   display: flex;
@@ -1311,15 +1344,15 @@ function buildBreakdown(r) {
 .ticker-track:hover { animation-play-state: paused; }
 .ticker-item {
   font-size: 13px;
-  font-weight: 600;
-  color: #bfdbfe;
+  font-weight: 700;
+  color: #f8fafc;
   padding: 0 40px;
   display: flex;
   align-items: center;
   gap: 10px;
 }
 .ticker-item .t-icon { font-size: 15px; }
-.ticker-item .t-date { color: #93c5fd; font-size: 11px; font-weight: 700; }
+.ticker-item .t-date { color: #fbbf24; font-size: 11px; font-weight: 800; }
 @keyframes ticker-scroll {
   0%   { transform: translateX(0); }
   100% { transform: translateX(-50%); }
@@ -1893,8 +1926,8 @@ function renderTicker() {
       <span class="t-icon">📅</span>
       <strong style="color:#fff">${e.title}</strong>
       <span class="t-date">${dateStr}</span>
-      <span style="color:${diff<=3&&diff>=0?'#fde68a':'#bfdbfe'};font-weight:700">${diffStr}</span>
-      ${e.desc ? `<span style="color:#93c5fd;font-size:11px">— ${e.desc}</span>` : ''}
+      <span style="color:${diff<=3&&diff>=0?'#fde68a':'#e2e8f0'};font-weight:700">${diffStr}</span>
+      ${e.desc ? `<span style="color:#cbd5e1;font-size:11px">— ${e.desc}</span>` : ''}
     </div>`;
   }).join('');
   // Duplicate for seamless loop
