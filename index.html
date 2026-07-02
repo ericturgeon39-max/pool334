@@ -1078,15 +1078,50 @@ PTS_TEAMS.forEach(team => {
 // ─── CACHE ──────────────────────────────────────────────────────────────────
 const statsCache = {};
 const SEASON = "20252026"; // Saison passée — sera changé pour 20262027 quand la nouvelle saison commence
-const CORS_PROXY = "https://corsproxy.io/?";
+
+// Plusieurs proxys CORS de secours : si le premier échoue (limite atteinte,
+// origine bloquée, etc.), on essaie automatiquement le suivant.
+const CORS_PROXIES = [
+  url => `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
+  url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+  url => `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(url)}`,
+];
+
+async function fetchJsonViaProxy(targetUrl) {
+  let lastErr = null;
+  for (const buildUrl of CORS_PROXIES) {
+    try {
+      const res = await fetch(buildUrl(targetUrl));
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    } catch (e) {
+      lastErr = e; // essaie le proxy suivant
+    }
+  }
+  throw lastErr || new Error('Tous les proxys ont échoué');
+}
+
+// Traite une liste d'éléments avec un nombre limité de requêtes en parallèle
+// (évite de se faire bloquer par les limites de débit des proxys gratuits).
+async function runWithConcurrency(items, limit, worker) {
+  const results = new Array(items.length);
+  let idx = 0;
+  async function next() {
+    while (idx < items.length) {
+      const current = idx++;
+      results[current] = await worker(items[current], current);
+    }
+  }
+  const runners = Array.from({ length: Math.min(limit, items.length) }, next);
+  await Promise.all(runners);
+  return results;
+}
 
 async function fetchPlayerStats(playerId) {
   if (statsCache[playerId]) return statsCache[playerId];
   try {
     const url = `https://api-web.nhle.com/v1/player/${playerId}/landing`;
-    const res = await fetch(CORS_PROXY + encodeURIComponent(url));
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
+    const data = await fetchJsonViaProxy(url);
     
     // Find current season stats
     const pos = data.position;
@@ -1157,9 +1192,7 @@ let nhlTeamPoints = {};
 async function fetchNHLTeamPoints() {
   try {
     const url = `https://api-web.nhle.com/v1/standings/${STANDINGS_DATE}`;
-    const res = await fetch(CORS_PROXY + encodeURIComponent(url));
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
+    const data = await fetchJsonViaProxy(url);
     const map = {};
     (data.standings || []).forEach(t => {
       const name = t.teamName?.default;
@@ -1188,26 +1221,31 @@ async function loadAllPlayerStats() {
 
   let loaded = 0;
   const total = PTS_TEAMS.reduce((s,t) => s + t.players.length, 0);
+  statusText.textContent = `Chargement des statistiques (0/${total} joueurs)…`;
 
-  allResults = [];
+  // Chaque joueur, de toutes les équipes, avec un maximum de 8 requêtes
+  // en parallèle à la fois (assez rapide, sans se faire bloquer par les proxys).
+  const allPlayers = [];
+  PTS_TEAMS.forEach(team => {
+    team.players.forEach(player => allPlayers.push({ team, player }));
+  });
 
-  for (const team of PTS_TEAMS) {
-    statusText.textContent = `Chargement: ${team.dg} (${loaded}/${total} joueurs)…`;
-    const playerStats = [];
-    for (const player of team.players) {
-      const stats = await fetchPlayerStats(player.id);
-      if (stats) {
-        playerStats.push({ ...stats, inputName: player.name, pos: player.pos });
-      } else {
-        playerStats.push({ pos: player.pos, gamesPlayed: 0, goals: 0, assists: 0, poolPts: 0, inputName: player.name });
-      }
-      loaded++;
-    }
+  await runWithConcurrency(allPlayers, 8, async ({ team, player }) => {
+    const stats = await fetchPlayerStats(player.id);
+    player._stats = stats
+      ? { ...stats, inputName: player.name, pos: player.pos }
+      : { pos: player.pos, gamesPlayed: 0, goals: 0, assists: 0, poolPts: 0, inputName: player.name };
+    loaded++;
+    statusText.textContent = `Chargement des statistiques (${loaded}/${total} joueurs)…`;
+  });
+
+  allResults = PTS_TEAMS.map(team => {
+    const playerStats = team.players.map(p => p._stats);
     const score = calcTeamScore(playerStats);
     score.nhlPts = nhlTeamPoints[team.nhl] ?? 0;
     score.combined = score.total + score.nhlPts;
-    allResults.push({ team, playerStats, score });
-  }
+    return { team, playerStats, score };
+  });
 
   allResults.sort((a,b) => b.score.combined - a.score.combined);
   renderStandings();
