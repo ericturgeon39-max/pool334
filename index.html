@@ -1087,11 +1087,24 @@ const CORS_PROXIES = [
   url => `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(url)}`,
 ];
 
+// Un proxy gratuit qui ne répond jamais bloquerait fetch() indéfiniment
+// (pas de timeout par défaut). On force donc un abandon après quelques
+// secondes pour passer automatiquement au proxy suivant.
+async function fetchWithTimeout(url, ms) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), ms);
+  try {
+    return await fetch(url, { signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function fetchJsonViaProxy(targetUrl) {
   let lastErr = null;
   for (const buildUrl of CORS_PROXIES) {
     try {
-      const res = await fetch(buildUrl(targetUrl));
+      const res = await fetchWithTimeout(buildUrl(targetUrl), 9000);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.json();
     } catch (e) {
@@ -1216,45 +1229,54 @@ async function loadAllPlayerStats() {
   const tbody = document.getElementById("pts-standings-body");
   tbody.innerHTML = '<tr class="loading-row"><td colspan="10">⏳ Chargement des statistiques depuis l\'API LNH…</td></tr>';
 
-  statusText.textContent = `Chargement du classement LNH…`;
-  nhlTeamPoints = await fetchNHLTeamPoints();
+  try {
+    statusText.textContent = `Chargement du classement LNH…`;
+    nhlTeamPoints = await fetchNHLTeamPoints();
 
-  let loaded = 0;
-  const total = PTS_TEAMS.reduce((s,t) => s + t.players.length, 0);
-  statusText.textContent = `Chargement des statistiques (0/${total} joueurs)…`;
+    let loaded = 0;
+    const total = PTS_TEAMS.reduce((s,t) => s + t.players.length, 0);
+    statusText.textContent = `Chargement des statistiques (0/${total} joueurs)…`;
 
-  // Chaque joueur, de toutes les équipes, avec un maximum de 8 requêtes
-  // en parallèle à la fois (assez rapide, sans se faire bloquer par les proxys).
-  const allPlayers = [];
-  PTS_TEAMS.forEach(team => {
-    team.players.forEach(player => allPlayers.push({ team, player }));
-  });
+    // Chaque joueur, de toutes les équipes, avec un maximum de 8 requêtes
+    // en parallèle à la fois (assez rapide, sans se faire bloquer par les proxys).
+    const allPlayers = [];
+    PTS_TEAMS.forEach(team => {
+      team.players.forEach(player => allPlayers.push({ team, player }));
+    });
 
-  await runWithConcurrency(allPlayers, 8, async ({ team, player }) => {
-    const stats = await fetchPlayerStats(player.id);
-    player._stats = stats
-      ? { ...stats, inputName: player.name, pos: player.pos }
-      : { pos: player.pos, gamesPlayed: 0, goals: 0, assists: 0, poolPts: 0, inputName: player.name };
-    loaded++;
-    statusText.textContent = `Chargement des statistiques (${loaded}/${total} joueurs)…`;
-  });
+    await runWithConcurrency(allPlayers, 8, async ({ team, player }) => {
+      const stats = await fetchPlayerStats(player.id);
+      player._stats = stats
+        ? { ...stats, inputName: player.name, pos: player.pos }
+        : { pos: player.pos, gamesPlayed: 0, goals: 0, assists: 0, poolPts: 0, inputName: player.name };
+      loaded++;
+      statusText.textContent = `Chargement des statistiques (${loaded}/${total} joueurs)…`;
+    });
 
-  allResults = PTS_TEAMS.map(team => {
-    const playerStats = team.players.map(p => p._stats);
-    const score = calcTeamScore(playerStats);
-    score.nhlPts = nhlTeamPoints[team.nhl] ?? 0;
-    score.combined = score.total + score.nhlPts;
-    return { team, playerStats, score };
-  });
+    allResults = PTS_TEAMS.map(team => {
+      const playerStats = team.players.map(p => p._stats);
+      const score = calcTeamScore(playerStats);
+      score.nhlPts = nhlTeamPoints[team.nhl] ?? 0;
+      score.combined = score.total + score.nhlPts;
+      return { team, playerStats, score };
+    });
 
-  allResults.sort((a,b) => b.score.combined - a.score.combined);
-  renderStandings();
+    allResults.sort((a,b) => b.score.combined - a.score.combined);
+    renderStandings();
 
-  spinnerEl.style.display = 'none';
-  statusText.textContent = `✅ Stats mises à jour — ${allResults.reduce((s,r) => s + r.playerStats.filter(p => p.gamesPlayed > 0).length, 0)} joueurs actifs`;
-  btn.disabled = false;
-
-  // (horodatage déjà affiché dans le message de statut)
+    const actifs = allResults.reduce((s,r) => s + r.playerStats.filter(p => p.gamesPlayed > 0).length, 0);
+    statusText.textContent = actifs > 0
+      ? `✅ Stats mises à jour — ${actifs} joueurs actifs`
+      : `⚠️ Stats chargées, mais aucune donnée reçue de l'API LNH (proxys probablement indisponibles). Réessayez avec 🔄 Actualiser.`;
+  } catch (e) {
+    // Filet de sécurité : même en cas d'erreur imprévue, on ne reste jamais
+    // bloqué sur "Chargement…" indéfiniment.
+    tbody.innerHTML = '<tr><td colspan="10" style="padding:40px;text-align:center;color:#dc2626">❌ Impossible de charger le classement (problème réseau ou proxy). Cliquez sur 🔄 Actualiser pour réessayer.</td></tr>';
+    statusText.textContent = `❌ Échec du chargement — réessayez avec 🔄 Actualiser`;
+  } finally {
+    spinnerEl.style.display = 'none';
+    btn.disabled = false;
+  }
 }
 
 function renderStandings() {
