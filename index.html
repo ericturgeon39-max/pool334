@@ -180,6 +180,19 @@
   .rank-num { font-size: 18px; font-weight: 900; color: #cbd5e1; min-width: 32px; display: inline-block; }
   .rank-num.top { color: #2563eb; }
 
+  .expansion-team-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+  .expansion-team-card summary { cursor: pointer; padding: 14px 20px; font-weight: 700; color: #1e293b; font-size: 14px; display: flex; justify-content: space-between; align-items: center; gap: 12px; list-style: none; }
+  .expansion-team-card summary::-webkit-details-marker { display: none; }
+  .expansion-team-card summary:hover { background: #f8fafc; }
+  .expansion-count-badge { font-size: 12px; font-weight: 800; padding: 4px 12px; border-radius: 20px; background: #eff6ff; color: #1d4ed8; white-space: nowrap; }
+  .expansion-count-badge.full { background: #fee2e2; color: #dc2626; }
+  .expansion-roster { padding: 4px 20px 16px 20px; border-top: 1px solid #f1f5f9; }
+  .protect-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid #f1f5f9; }
+  .protect-row:last-child { border-bottom: none; }
+  .protect-row input[type=checkbox] { width: 18px; height: 18px; accent-color: #2563eb; cursor: pointer; flex-shrink: 0; }
+  .protect-row.protected { background: #f0f9ff; margin: 0 -12px; padding: 8px 12px; border-radius: 8px; }
+  .protect-name { font-weight: 600; color: #1e293b; flex: 1; font-size: 14px; }
+
   @media (max-width: 640px) {
     .header-inner { padding: 12px 16px; }
     .main { padding: 20px 16px; }
@@ -247,6 +260,7 @@
     <button class="nav-tab" onclick="showTab('recrues-prises')">Recrues repêchées</button>
     <button class="nav-tab" onclick="showTab('joueurs-pris')">Joueurs signés</button>
     <button class="nav-tab" onclick="showTab('reglements')">Règlements</button>
+    <button class="nav-tab" onclick="showTab('expansion-2026')">Expansion 2026</button>
   </div>
 </nav>
 
@@ -384,6 +398,46 @@
       <div class="rule-card"><div class="rule-icon">✍️</div><div class="rule-title">Signatures & ballottage</div><div class="rule-item"><div class="rule-dot"></div><div>2 soirées de signatures : début décembre et date limite LNH</div></div><div class="rule-item"><div class="rule-dot"></div><div>4 rondes max par soirée, ordre inverse au classement</div></div><div class="rule-item"><div class="rule-dot"></div><div>Ballottage : 50% salaire pour libérer — si réclamé, l'autre DG paie 50%</div></div><div class="rule-item"><div class="rule-dot"></div><div>Une recrue activée devient "Pro" — impossible de la renvoyer aux mineurs</div></div></div>
       <div class="rule-card"><div class="rule-icon">🤝</div><div class="rule-title">Les échanges</div><div class="rule-item"><div class="rule-dot"></div><div>Échangeables : joueurs, choix, recrues. Équipes contre équipes seulement</div></div><div class="rule-item"><div class="rule-dot"></div><div>Période : fin des séries → fin soirée de décembre</div></div><div class="rule-item"><div class="rule-dot"></div><div>Max 3 joueurs réguliers échangés avec un même DG par période</div></div><div class="rule-item"><div class="rule-dot"></div><div>Validation par courriel des deux parties</div></div></div>
       <div class="rule-card"><div class="rule-icon">🚀</div><div class="rule-title">Processus d'expansion</div><div class="rule-item"><div class="rule-dot"></div><div>Chaque DG peut protéger max. 12 joueurs</div></div><div class="rule-item"><div class="rule-dot"></div><div>L'équipe d'expansion pige parmi les non-protégés et agents libres</div></div><div class="rule-item"><div class="rule-dot"></div><div>Un DG existant ne peut perdre qu'un maximum de 2 joueurs</div></div><div class="rule-item"><div class="rule-dot"></div><div>L'équipe d'expansion obtient le 1er choix partout (sauf amateur : 2e)</div></div></div>
+    </div>
+  </div>
+
+  <div id="tab-expansion-2026" class="tab-content" style="display:none">
+    <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:14px 20px;margin-bottom:20px;display:flex;align-items:center;gap:10px">
+      <span style="font-size:20px">🚀</span>
+      <div style="font-size:13px;color:#1e40af;line-height:1.5">
+        <strong>Repêchage d'expansion 2026.</strong> Chaque DG protège jusqu'à 12 joueurs de sa formation (cases à cocher ci-dessous). Le bassin de joueurs non protégés, exposés au repêchage d'expansion, se met à jour automatiquement plus bas.
+      </div>
+    </div>
+
+    <div class="section-title">🛡️ Protections par équipe</div>
+    <div id="expansion-teams-list"></div>
+
+    <div class="section-title" style="margin-top:28px">📋 Bassin de joueurs exposés (non protégés)</div>
+    <div style="margin-bottom:16px;display:flex;flex-wrap:wrap;gap:10px">
+      <input type="text" id="expansion-search" placeholder="🔍 Rechercher un joueur..." oninput="filterExposedPool()"
+        style="flex:1;min-width:200px;padding:10px 14px;border:1px solid #e2e8f0;border-radius:10px;font-size:14px;outline:none;color:#1e293b">
+      <select id="expansion-team-filter" onchange="filterExposedPool()" style="padding:10px 14px;border:1px solid #e2e8f0;border-radius:10px;font-size:14px;color:#1e293b">
+        <option value="">Toutes les équipes</option>
+      </select>
+      <select id="expansion-pos-filter" onchange="filterExposedPool()" style="padding:10px 14px;border:1px solid #e2e8f0;border-radius:10px;font-size:14px;color:#1e293b">
+        <option value="">Toutes les positions</option>
+        <option value="G">Gardien</option>
+        <option value="D">Défenseur</option>
+        <option value="A">Attaquant</option>
+      </select>
+    </div>
+    <div class="standings-wrap" style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.04)">
+      <table class="standings-table" style="width:100%">
+        <thead>
+          <tr>
+            <th class="left">Nom</th>
+            <th>Pos.</th>
+            <th>Salaire</th>
+            <th class="left">Équipe NHL (DG)</th>
+          </tr>
+        </thead>
+        <tbody id="expansion-exposed-body"></tbody>
+      </table>
     </div>
   </div>
 </main>
@@ -715,14 +769,142 @@ function buildSalaryStandings(){
   });
 }
 
+// ── EXPANSION 2026 ──
+const MAX_PROTECTED = 12;
+
+function getExpansionProtections() {
+  try { return JSON.parse(localStorage.getItem('pool-expansion-protections') || '{}'); }
+  catch { return {}; }
+}
+function saveExpansionProtections(obj) {
+  localStorage.setItem('pool-expansion-protections', JSON.stringify(obj));
+}
+
+window.toggleProtection = function(teamIdx, playerName) {
+  const team = teams[teamIdx];
+  const prot = getExpansionProtections();
+  const key = team.nhl;
+  if (!prot[key]) prot[key] = [];
+  const i = prot[key].indexOf(playerName);
+  if (i >= 0) {
+    prot[key].splice(i, 1);
+  } else {
+    if (prot[key].length >= MAX_PROTECTED) {
+      alert(`Maximum ${MAX_PROTECTED} joueurs protégés par équipe.`);
+      buildExpansionTeamsList();
+      return;
+    }
+    prot[key].push(playerName);
+  }
+  saveExpansionProtections(prot);
+  buildExpansionTeamsList();
+  buildExposedPool();
+};
+
+function buildExpansionTeamsList() {
+  const container = document.getElementById('expansion-teams-list');
+  if (!container) return;
+  const prot = getExpansionProtections();
+  container.innerHTML = teams.map((t, ti) => {
+    const protectedList = prot[t.nhl] || [];
+    const count = protectedList.length;
+    const allPlayers = [
+      ...t.roster.G.map(p => ({ ...p, pos: 'G' })),
+      ...t.roster.D.map(p => ({ ...p, pos: 'D' })),
+      ...t.roster.A.map(p => ({ ...p, pos: 'A' }))
+    ];
+    const rows = allPlayers.map(p => {
+      const isProt = protectedList.includes(p.name);
+      const salStr = typeof p.salary === 'number' ? fmt(p.salary) : p.salary;
+      const salClass = p.salary === 'RFA' ? 'rfa' : p.salary === 'UFA' ? 'ufa' : '';
+      const safeName = p.name.replace(/'/g, "\\'");
+      return `<label class="protect-row ${isProt ? 'protected' : ''}">
+        <input type="checkbox" ${isProt ? 'checked' : ''} onchange="toggleProtection(${ti},'${safeName}')">
+        <span class="pos-badge pos-${p.pos}">${p.pos}</span>
+        <span class="protect-name">${p.name}</span>
+        <span class="salary-tag ${salClass}">${salStr}</span>
+      </label>`;
+    }).join('');
+    return `<details class="expansion-team-card">
+      <summary>
+        <span>${t.nhl} <span style="color:#94a3b8;font-weight:600">(${t.dg})</span></span>
+        <span class="expansion-count-badge ${count >= MAX_PROTECTED ? 'full' : ''}">${count}/${MAX_PROTECTED} protégés</span>
+      </summary>
+      <div class="expansion-roster">${rows}</div>
+    </details>`;
+  }).join('');
+}
+
+function buildExposedPool() {
+  const prot = getExpansionProtections();
+  const pool = [];
+  teams.forEach(t => {
+    const protectedList = prot[t.nhl] || [];
+    ['G', 'D', 'A'].forEach(pos => {
+      t.roster[pos].forEach(p => {
+        if (!protectedList.includes(p.name)) {
+          pool.push({ ...p, pos, nhl: t.nhl, dg: t.dg });
+        }
+      });
+    });
+  });
+  window.__exposedPool = pool;
+  filterExposedPool();
+}
+
+function renderExposedTable(pool) {
+  const tbody = document.getElementById('expansion-exposed-body');
+  if (!tbody) return;
+  const sorted = [...pool].sort((a, b) => a.nhl.localeCompare(b.nhl) || a.name.localeCompare(b.name));
+  tbody.innerHTML = sorted.map(p => {
+    const salStr = typeof p.salary === 'number' ? fmt(p.salary) : p.salary;
+    const salClass = p.salary === 'RFA' ? 'rfa' : p.salary === 'UFA' ? 'ufa' : '';
+    return `<tr>
+      <td class="left player-name">${p.name}</td>
+      <td><span class="pos-badge pos-${p.pos}">${p.pos}</span></td>
+      <td><span class="salary-tag ${salClass}">${salStr}</span></td>
+      <td class="left">${p.nhl} <span style="color:#94a3b8;font-size:12px">(${p.dg})</span></td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="4" style="text-align:center;padding:24px;color:#94a3b8">Aucun joueur exposé</td></tr>';
+}
+
+window.filterExposedPool = function() {
+  const q = (document.getElementById('expansion-search')?.value || '').trim().toLowerCase();
+  const teamFilter = document.getElementById('expansion-team-filter')?.value || '';
+  const posFilter = document.getElementById('expansion-pos-filter')?.value || '';
+  let pool = window.__exposedPool || [];
+  if (teamFilter) pool = pool.filter(p => p.nhl === teamFilter);
+  if (posFilter) pool = pool.filter(p => p.pos === posFilter);
+  if (q) pool = pool.filter(p => p.name.toLowerCase().includes(q));
+  renderExposedTable(pool);
+};
+
+function populateExpansionTeamFilter() {
+  const sel = document.getElementById('expansion-team-filter');
+  if (!sel || sel.dataset.filled) return;
+  teams.forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t.nhl; opt.textContent = t.nhl;
+    sel.appendChild(opt);
+  });
+  sel.dataset.filled = '1';
+}
+
+function buildExpansionTab() {
+  populateExpansionTeamFilter();
+  buildExpansionTeamsList();
+  buildExposedPool();
+}
+
 function showTab(id){
   document.querySelectorAll('.tab-content').forEach(el=>el.style.display='none');
   document.querySelectorAll('.nav-tab').forEach(btn=>btn.classList.remove('active'));
   document.getElementById('tab-'+id).style.display='block';
-  const tabs=['equipes','transactions','classement','recrues-prises','joueurs-pris','reglements'];
+  const tabs=['equipes','transactions','classement','recrues-prises','joueurs-pris','reglements','expansion-2026'];
   document.querySelectorAll('.nav-tab')[tabs.indexOf(id)].classList.add('active');
   if(id==='equipes'){document.getElementById('team-list-view').style.display='grid';document.getElementById('team-detail-container').innerHTML='';document.getElementById('team-detail-container').style.display='none';}
   if(id==='classement' && !window.__ptsLoadedOnce){ window.__ptsLoadedOnce = true; loadAllPlayerStats(); }
+  if(id==='expansion-2026' && !window.__expansionLoadedOnce){ window.__expansionLoadedOnce = true; buildExpansionTab(); }
 }
 
 applySalaryOverrides();
@@ -2037,4 +2219,3 @@ renderMessages();
 </script>
 </body>
 </html>
-
