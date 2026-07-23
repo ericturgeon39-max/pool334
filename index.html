@@ -772,33 +772,17 @@ function buildSalaryStandings(){
 // ── EXPANSION 2026 ──
 const MAX_PROTECTED = 12;
 
+// Les protections d'expansion sont maintenant stockées dans Firebase
+// (voir le <script type="module"> plus bas, section EXPANSION PROTECTIONS)
+// — donc partagées en temps réel entre tous les DG, peu importe leur appareil.
 function getExpansionProtections() {
-  try { return JSON.parse(localStorage.getItem('pool-expansion-protections') || '{}'); }
-  catch { return {}; }
-}
-function saveExpansionProtections(obj) {
-  localStorage.setItem('pool-expansion-protections', JSON.stringify(obj));
+  return window.expansionProtectionsCache || {};
 }
 
 window.toggleProtection = function(teamIdx, playerName) {
-  const team = teams[teamIdx];
-  const prot = getExpansionProtections();
-  const key = team.nhl;
-  if (!prot[key]) prot[key] = [];
-  const i = prot[key].indexOf(playerName);
-  if (i >= 0) {
-    prot[key].splice(i, 1);
-  } else {
-    if (prot[key].length >= MAX_PROTECTED) {
-      alert(`Maximum ${MAX_PROTECTED} joueurs protégés par équipe.`);
-      buildExpansionTeamsList();
-      return;
-    }
-    prot[key].push(playerName);
+  if (window.toggleProtectionShared) {
+    window.toggleProtectionShared(teamIdx, playerName);
   }
-  saveExpansionProtections(prot);
-  buildExpansionTeamsList();
-  buildExposedPool();
 };
 
 function buildExpansionTeamsList() {
@@ -1969,23 +1953,22 @@ function buildBreakdown(r) {
 ════════════════════════════════════════════════════════════ -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push, onValue, remove, serverTimestamp }
+import { getDatabase, ref, push, onValue, set, get, remove, serverTimestamp }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-// ── Firebase config (free Realtime Database) ──
+// ── Firebase config (real project: pool334) ──
 const firebaseConfig = {
-  apiKey: "AIzaSyDemo-PoolHockey-Replace-With-Real",
-  authDomain: "pool-hockey-demo.firebaseapp.com",
-  databaseURL: "https://pool-hockey-demo-default-rtdb.firebaseio.com",
-  projectId: "pool-hockey-demo",
-  storageBucket: "pool-hockey-demo.appspot.com",
-  messagingSenderId: "000000000000",
-  appId: "1:000000000000:web:0000000000000000"
+  apiKey: "AIzaSyAxozedQvOL7Jt-HFCCPZfOQW1Oa8lOmys",
+  authDomain: "pool334-a08dc.firebaseapp.com",
+  databaseURL: "https://pool334-a08dc-default-rtdb.firebaseio.com",
+  projectId: "pool334-a08dc",
+  storageBucket: "pool334-a08dc.firebasestorage.app",
+  messagingSenderId: "753279257158",
+  appId: "1:753279257158:web:9927ab44c03b179e31d847"
 };
 
-// ─── FALLBACK: localStorage-based chat (works without Firebase) ───────────
-// We'll use localStorage so it works immediately without Firebase setup
-// Messages will persist per browser — good enough for testing
+const fbApp = initializeApp(firebaseConfig);
+const db = getDatabase(fbApp);
 
 const ADMIN_NAME = "Eric Turgeon";  // ← ton nom exact
 const ADMIN_KEY  = "poolhockey2627commissaire"; // mot de passe admin simple
@@ -2008,20 +1991,43 @@ function checkAdmin() {
 }
 checkAdmin();
 
-// ── MESSAGES (localStorage) ──
-function getMessages() {
-  try { return JSON.parse(localStorage.getItem('pool-chat-msgs') || '[]'); }
-  catch { return []; }
-}
-function saveMessages(msgs) {
-  // Keep last 200 messages
-  if (msgs.length > 200) msgs = msgs.slice(-200);
-  localStorage.setItem('pool-chat-msgs', JSON.stringify(msgs));
-}
-
-let lastCount = getMessages().length;
+// ── MESSAGES (Firebase Realtime Database — partagé entre tous) ──
+const chatRef = ref(db, 'chatMessages');
+let chatMessagesCache = [];
 let chatOpen = false;
 let unread = 0;
+let chatLastCount = 0;
+let chatInitialLoad = true;
+
+onValue(chatRef, (snapshot) => {
+  const msgs = [];
+  snapshot.forEach(child => msgs.push(child.val()));
+  chatMessagesCache = msgs;
+
+  if (chatInitialLoad) {
+    chatLastCount = msgs.length;
+    chatInitialLoad = false;
+  } else if (msgs.length > chatLastCount) {
+    if (!chatOpen) {
+      unread += msgs.length - chatLastCount;
+      const badge = document.getElementById('chat-badge');
+      if (badge) {
+        badge.textContent = unread > 9 ? '9+' : unread;
+        badge.style.display = 'flex';
+      }
+    }
+    chatLastCount = msgs.length;
+  } else {
+    chatLastCount = msgs.length;
+  }
+  renderMessages();
+}, (err) => {
+  console.error('Firebase chatMessages error:', err);
+});
+
+function getMessages() {
+  return chatMessagesCache;
+}
 
 function renderMessages() {
   const msgs = getMessages();
@@ -2062,33 +2068,38 @@ function escapeHtml(t) {
   return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-window.sendMessage = function() {
+window.sendMessage = async function() {
   const input = document.getElementById('chat-input');
   const text = input.value.trim();
   const name = nameInput.value.trim();
   if (!text) return;
   if (!name) { nameInput.focus(); nameInput.style.borderColor='#ef4444'; return; }
   nameInput.style.borderColor='';
-
-  const msgs = getMessages();
-  msgs.push({ name, text, ts: Date.now(), type: 'chat' });
-  saveMessages(msgs);
   input.value = '';
   input.style.height = 'auto';
-  renderMessages();
+
+  try {
+    await push(chatRef, { name, text, ts: Date.now(), type: 'chat' });
+  } catch (e) {
+    console.error('Erreur envoi message (Firebase):', e);
+    alert("⚠️ Le message n'a pas pu être envoyé (connexion). Réessaie.");
+  }
 };
 
-window.sendAdminMessage = function() {
+window.sendAdminMessage = async function() {
   const input = document.getElementById('admin-msg-input');
   const text = input.value.trim();
   if (!text) return;
-  const msgs = getMessages();
-  msgs.push({ name: ADMIN_NAME, text, ts: Date.now(), type: 'system' });
-  saveMessages(msgs);
   input.value = '';
-  renderMessages();
-  document.getElementById('admin-status').textContent = '✅ Annonce envoyée!';
-  setTimeout(() => document.getElementById('admin-status').textContent = '', 2000);
+
+  try {
+    await push(chatRef, { name: ADMIN_NAME, text, ts: Date.now(), type: 'system' });
+    document.getElementById('admin-status').textContent = '✅ Annonce envoyée!';
+  } catch (e) {
+    console.error('Erreur envoi annonce (Firebase):', e);
+    document.getElementById('admin-status').textContent = "⚠️ Échec de l'envoi (connexion)";
+  }
+  setTimeout(() => document.getElementById('admin-status').textContent = '', 2500);
 };
 
 window.autoResize = function(el) {
@@ -2115,43 +2126,44 @@ window.toggleAdmin = function() {
   document.getElementById('admin-panel').classList.toggle('open');
 };
 
-// Poll for new messages every 5s
-setInterval(() => {
-  const msgs = getMessages();
-  if (msgs.length > lastCount) {
-    if (!chatOpen) {
-      unread += msgs.length - lastCount;
-      const badge = document.getElementById('chat-badge');
-      badge.textContent = unread > 9 ? '9+' : unread;
-      badge.style.display = 'flex';
-    } else {
-      renderMessages();
-    }
-    lastCount = msgs.length;
+// (Le rafraîchissement du chat se fait maintenant en temps réel via onValue
+// ci-dessus — plus besoin de sonder localStorage toutes les 3 secondes.)
+
+// ── EVENTS / TICKER (Firebase Realtime Database — partagé entre tous) ──
+const eventsRef = ref(db, 'events');
+let eventsCache = [];
+let eventsInitialLoad = true;
+
+onValue(eventsRef, async (snapshot) => {
+  const raw = snapshot.val();
+
+  if (raw === null && eventsInitialLoad) {
+    // Personne n'a encore d'événements dans Firebase — on sème les valeurs
+    // par défaut une seule fois (la 1re personne à charger la page après
+    // le branchement de Firebase déclenche ceci).
+    eventsInitialLoad = false;
+    const defaults = [
+      { title: "Soirée de signatures #1", date: "2026-12-05", desc: "Début décembre — ordre inverse au classement" },
+      { title: "Date limite LNH", date: "2027-03-07", desc: "Soirée de signatures #2" },
+      { title: "Début des séries éliminatoires", date: "2027-04-19", desc: "Choix de la 2e équipe NHL" },
+      { title: "Draft agents libres", date: "2027-07-01", desc: "Début de la prochaine saison" },
+    ];
+    try { await set(eventsRef, defaults); } catch (e) { console.error('Erreur seed events:', e); }
+    return; // onValue se redéclenchera avec les nouvelles données
   }
-}, 3000);
 
-// ── EVENTS / TICKER ──
+  eventsInitialLoad = false;
+  eventsCache = Array.isArray(raw) ? raw.filter(Boolean)
+    : (raw && typeof raw === 'object') ? Object.values(raw).filter(Boolean)
+    : [];
+  renderTicker();
+}, (err) => {
+  console.error('Firebase events error:', err);
+});
+
 function getEvents() {
-  try { return JSON.parse(localStorage.getItem('pool-events') || '[]'); }
-  catch { return []; }
+  return eventsCache;
 }
-function saveEvents(evts) {
-  localStorage.setItem('pool-events', JSON.stringify(evts));
-}
-
-// Default events (Eric can replace)
-function initDefaultEvents() {
-  if (localStorage.getItem('pool-events')) return;
-  const defaults = [
-    { title: "Soirée de signatures #1", date: "2026-12-05", desc: "Début décembre — ordre inverse au classement" },
-    { title: "Date limite LNH", date: "2027-03-07", desc: "Soirée de signatures #2" },
-    { title: "Début des séries éliminatoires", date: "2027-04-19", desc: "Choix de la 2e équipe NHL" },
-    { title: "Draft agents libres", date: "2027-07-01", desc: "Début de la prochaine saison" },
-  ];
-  saveEvents(defaults);
-}
-initDefaultEvents();
 
 function renderTicker() {
   const evts = getEvents();
@@ -2183,7 +2195,7 @@ function renderTicker() {
   track.innerHTML = items + items;
 }
 
-window.addEvent = function() {
+window.addEvent = async function() {
   const title = document.getElementById('event-title').value.trim();
   const date  = document.getElementById('event-date').value;
   const desc  = document.getElementById('event-desc').value.trim();
@@ -2191,22 +2203,93 @@ window.addEvent = function() {
     document.getElementById('admin-status').textContent = '⚠️ Titre et date requis';
     return;
   }
-  const evts = getEvents();
-  evts.push({ title, date, desc });
-  saveEvents(evts);
+  const updated = [...eventsCache, { title, date, desc }];
   document.getElementById('event-title').value = '';
   document.getElementById('event-date').value = '';
   document.getElementById('event-desc').value = '';
-  renderTicker();
-  document.getElementById('admin-status').textContent = '✅ Événement ajouté!';
+  try {
+    await set(eventsRef, updated);
+    document.getElementById('admin-status').textContent = '✅ Événement ajouté!';
+  } catch (e) {
+    console.error('Erreur ajout événement (Firebase):', e);
+    document.getElementById('admin-status').textContent = "⚠️ Échec de l'ajout (connexion)";
+  }
   setTimeout(() => document.getElementById('admin-status').textContent = '', 2000);
 };
 
-window.clearEvents = function() {
+window.clearEvents = async function() {
   if (!confirm('Effacer tous les événements?')) return;
-  localStorage.removeItem('pool-events');
-  renderTicker();
-  document.getElementById('admin-status').textContent = '🗑 Effacé';
+  try {
+    await remove(eventsRef);
+    document.getElementById('admin-status').textContent = '🗑 Effacé';
+  } catch (e) {
+    console.error('Erreur suppression événements (Firebase):', e);
+    document.getElementById('admin-status').textContent = '⚠️ Échec de la suppression';
+  }
+};
+
+// ── EXPANSION PROTECTIONS (Firebase Realtime Database — partagé entre tous) ──
+// Chemin: expansionProtections/<nomEquipeNHL>/<index> = "Nom Joueur"
+// (les noms d'équipe contiennent des espaces/accents, donc on les encode
+// pour en faire des clés Firebase valides — Firebase interdit ".", "#", "$", "[", "]", "/")
+function teamKey(nhlName) {
+  return encodeURIComponent(nhlName).replace(/\./g, '%2E');
+}
+
+window.expansionProtectionsCache = {}; // { "Montréal Canadiens": ["Nom1","Nom2",...], ... }
+let expansionReady = false;
+
+const expansionProtectionsRef = ref(db, 'expansionProtections');
+onValue(expansionProtectionsRef, (snapshot) => {
+  const raw = snapshot.val() || {};
+  const rebuilt = {};
+  teams.forEach(t => {
+    const k = teamKey(t.nhl);
+    const val = raw[k];
+    // val is stored as an object (Firebase turns dense arrays into arrays,
+    // but to be safe we normalize both array and object shapes)
+    if (Array.isArray(val)) rebuilt[t.nhl] = val.filter(Boolean);
+    else if (val && typeof val === 'object') rebuilt[t.nhl] = Object.values(val).filter(Boolean);
+    else rebuilt[t.nhl] = [];
+  });
+  window.expansionProtectionsCache = rebuilt;
+  expansionReady = true;
+  // Re-render live for everyone viewing the page, any time anyone changes a checkbox
+  if (document.getElementById('expansion-teams-list')) {
+    buildExpansionTeamsList();
+    buildExposedPool();
+  }
+}, (err) => {
+  console.error('Firebase expansionProtections error:', err);
+});
+
+function getExpansionProtectionsShared() {
+  return window.expansionProtectionsCache;
+}
+
+window.toggleProtectionShared = async function(teamIdx, playerName) {
+  const team = teams[teamIdx];
+  const current = window.expansionProtectionsCache[team.nhl] || [];
+  let updated;
+  if (current.includes(playerName)) {
+    updated = current.filter(n => n !== playerName);
+  } else {
+    if (current.length >= MAX_PROTECTED) {
+      alert(`Maximum ${MAX_PROTECTED} joueurs protégés par équipe.`);
+      return;
+    }
+    updated = [...current, playerName];
+  }
+  // Optimistic local update so the UI feels instant
+  window.expansionProtectionsCache[team.nhl] = updated;
+  buildExpansionTeamsList();
+  buildExposedPool();
+  try {
+    await set(ref(db, `expansionProtections/${teamKey(team.nhl)}`), updated);
+  } catch (e) {
+    console.error('Erreur sauvegarde protection (Firebase):', e);
+    alert("⚠️ La protection n'a pas pu être sauvegardée (connexion). Réessaie.");
+  }
 };
 
 // Move ticker above nav
