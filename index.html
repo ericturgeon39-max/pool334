@@ -180,19 +180,6 @@
   .rank-num { font-size: 18px; font-weight: 900; color: #cbd5e1; min-width: 32px; display: inline-block; }
   .rank-num.top { color: #2563eb; }
 
-  .expansion-team-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
-  .expansion-team-card summary { cursor: pointer; padding: 14px 20px; font-weight: 700; color: #1e293b; font-size: 14px; display: flex; justify-content: space-between; align-items: center; gap: 12px; list-style: none; }
-  .expansion-team-card summary::-webkit-details-marker { display: none; }
-  .expansion-team-card summary:hover { background: #f8fafc; }
-  .expansion-count-badge { font-size: 12px; font-weight: 800; padding: 4px 12px; border-radius: 20px; background: #eff6ff; color: #1d4ed8; white-space: nowrap; }
-  .expansion-count-badge.full { background: #fee2e2; color: #dc2626; }
-  .expansion-roster { padding: 4px 20px 16px 20px; border-top: 1px solid #f1f5f9; }
-  .protect-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid #f1f5f9; }
-  .protect-row:last-child { border-bottom: none; }
-  .protect-row input[type=checkbox] { width: 18px; height: 18px; accent-color: #2563eb; cursor: pointer; flex-shrink: 0; }
-  .protect-row.protected { background: #f0f9ff; margin: 0 -12px; padding: 8px 12px; border-radius: 8px; }
-  .protect-name { font-weight: 600; color: #1e293b; flex: 1; font-size: 14px; }
-
   @media (max-width: 640px) {
     .header-inner { padding: 12px 16px; }
     .main { padding: 20px 16px; }
@@ -260,7 +247,6 @@
     <button class="nav-tab" onclick="showTab('recrues-prises')">Recrues repêchées</button>
     <button class="nav-tab" onclick="showTab('joueurs-pris')">Joueurs signés</button>
     <button class="nav-tab" onclick="showTab('reglements')">Règlements</button>
-    
   </div>
 </nav>
 
@@ -400,46 +386,6 @@
       <div class="rule-card"><div class="rule-icon">🚀</div><div class="rule-title">Processus d'expansion</div><div class="rule-item"><div class="rule-dot"></div><div>Chaque DG peut protéger max. 12 joueurs</div></div><div class="rule-item"><div class="rule-dot"></div><div>L'équipe d'expansion pige parmi les non-protégés et agents libres</div></div><div class="rule-item"><div class="rule-dot"></div><div>Un DG existant ne peut perdre qu'un maximum de 2 joueurs</div></div><div class="rule-item"><div class="rule-dot"></div><div>L'équipe d'expansion obtient le 1er choix partout (sauf amateur : 2e)</div></div></div>
     </div>
   </div>
-
-  <div id="tab-expansion-2026" class="tab-content" style="display:none">
-    <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:14px 20px;margin-bottom:20px;display:flex;align-items:center;gap:10px">
-      <span style="font-size:20px">🚀</span>
-      <div style="font-size:13px;color:#1e40af;line-height:1.5">
-        <strong>Repêchage d'expansion 2026.</strong> Chaque DG protège jusqu'à 12 joueurs de sa formation (cases à cocher ci-dessous). Le bassin de joueurs non protégés, exposés au repêchage d'expansion, se met à jour automatiquement plus bas.
-      </div>
-    </div>
-
-    <div class="section-title">🛡️ Protections par équipe</div>
-    <div id="expansion-teams-list"></div>
-
-    <div class="section-title" style="margin-top:28px">📋 Bassin de joueurs exposés (non protégés)</div>
-    <div style="margin-bottom:16px;display:flex;flex-wrap:wrap;gap:10px">
-      <input type="text" id="expansion-search" placeholder="🔍 Rechercher un joueur..." oninput="filterExposedPool()"
-        style="flex:1;min-width:200px;padding:10px 14px;border:1px solid #e2e8f0;border-radius:10px;font-size:14px;outline:none;color:#1e293b">
-      <select id="expansion-team-filter" onchange="filterExposedPool()" style="padding:10px 14px;border:1px solid #e2e8f0;border-radius:10px;font-size:14px;color:#1e293b">
-        <option value="">Toutes les équipes</option>
-      </select>
-      <select id="expansion-pos-filter" onchange="filterExposedPool()" style="padding:10px 14px;border:1px solid #e2e8f0;border-radius:10px;font-size:14px;color:#1e293b">
-        <option value="">Toutes les positions</option>
-        <option value="G">Gardien</option>
-        <option value="D">Défenseur</option>
-        <option value="A">Attaquant</option>
-      </select>
-    </div>
-    <div class="standings-wrap" style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.04)">
-      <table class="standings-table" style="width:100%">
-        <thead>
-          <tr>
-            <th class="left">Nom</th>
-            <th>Pos.</th>
-            <th>Salaire</th>
-            <th class="left">Équipe NHL (DG)</th>
-          </tr>
-        </thead>
-        <tbody id="expansion-exposed-body"></tbody>
-      </table>
-    </div>
-  </div>
 </main>
 
 <script>
@@ -450,10 +396,10 @@ const teams = [
   { nhl:"Dallas Stars", dg:"Philippe Desrochers", masse:128008333, roster:{ G:[{name:"Wedgewood Scott",salary:2500000}], D:[{name:"Karlsson Erik",salary:11500000},{name:"Dahlin Rasmus",salary:11000000},{name:"Werenski Zach",salary:9583333},{name:"Heiskanen Miro",salary:8450000},{name:"Hedman Victor",salary:8000000},{name:"Nemec Simon",salary:7250000}], A:[{name:"Kaprizov Kirill",salary:17000000},{name:"MacKinnon Nathan",salary:12600000},{name:"Thomas Robert",salary:8125000},{name:"Knies Matthew",salary:7750000},{name:"Nelson Brock",salary:7500000},{name:"Vilardi Gabe",salary:7500000},{name:"Hagel Brandon",salary:6500000},{name:"Strome Dylan",salary:5000000},{name:"Rossi Marco",salary:5000000},{name:"Giroux Claude",salary:2000000}] }, prospects:[{num:1,year:2021,name:"Cossa Sebastian",pos:"G",team:"DET"},{num:2,year:2021,name:"Hreschuk Aidan",pos:"D",team:"CAR"},{num:3,year:2021,name:"Koivunen Ville",pos:"A",team:"PIT"},{num:4,year:2022,name:"Howard Isaac",pos:"A",team:"EDM"},{num:5,year:2022,name:"Minten Fraser",pos:"A",team:"BOS"},{num:6,year:2022,name:"Haight Hunter",pos:"A",team:"MIN"},{num:7,year:2022,name:"Nordberg Filip",pos:"D",team:"OTT"},{num:8,year:2023,name:"Smith William",pos:"A",team:"SJS"},{num:9,year:2023,name:"Barlow Colby",pos:"A",team:"WIN"},{num:10,year:2023,name:"Sale Eduard",pos:"A",team:"SEA"},{num:11,year:2023,name:"Brindley Gavin",pos:"A",team:"COL"},{num:12,year:2023,name:"Cristall Andrew",pos:"A",team:"WAS"},{num:13,year:2023,name:"Bjarnason Carson",pos:"G",team:"PHI"},{num:14,year:2023,name:"Clara Damian",pos:"G",team:"ANA"},{num:15,year:2024,name:"Parekh Zayne",pos:"D",team:"CGY"},{num:16,year:2024,name:"Jiricek Adam",pos:"D",team:"STL"},{num:17,year:2024,name:"Hemming Emil",pos:"A",team:"DAL"},{num:18,year:2024,name:"Basha Andrew",pos:"A",team:"CGY"},{num:19,year:2024,name:"Howe Tanner",pos:"A",team:"PIT"},{num:20,year:2024,name:"Bednarik Kamil",pos:"A",team:"NYI"},{num:21,year:2025,name:"Brady Martin",pos:"A",team:"NSH"},{num:22,year:2025,name:"Reschny Cole",pos:"A",team:"CGY"},{num:23,year:2025,name:"Brzustewicz Henry",pos:"D",team:"LA"},{num:24,year:2025,name:"Spence Malcolm",pos:"A",team:"NYR"},{num:25,year:2025,name:"Ihs-Wozniac Jakob",pos:"A",team:"VEG"}], picks:[{round:4,dg:"Zack",year:2026}] },
   { nhl:"Carolina Hurricanes", dg:"Gabriel", masse:92621428, roster:{ G:[{name:"Thompson Logan",salary:5850000}], D:[{name:"Nemec Simon",salary:7250000},{name:"Montour Brandon",salary:7142857},{name:"Samuelsson Mathias",salary:4285714},{name:"Dunn Vince",salary:7350000},{name:"Mintyukov Pavel",salary:7200000},{name:"Casey Seamus",salary:950000}], A:[{name:"Beniers Matthew",salary:7142857},{name:"Holloway Dylan",salary:7750000},{name:"Geekie Morgan",salary:5500000},{name:"Rossi Marco",salary:5000000},{name:"Nugent-Hopkins Ryan",salary:5125000},{name:"Schmaltz Nick",salary:5850000},{name:"Wilson Tom",salary:6500000},{name:"Batherson Drake",salary:4975000},{name:"Fantilli Adam",salary:"RFA"},{name:"Graff Collin",salary:4250000}] }, prospects:[{num:1,year:2021,name:"Lysell Fabian",pos:"A",team:"BOS"},{num:2,year:2021,name:"Allan Nolan",pos:"D",team:"CHI"},{num:3,year:2021,name:"Dean Zachary",pos:"A",team:"VEG"},{num:4,year:2022,name:"Snuggerud Jimmy",pos:"A",team:"STL"},{num:5,year:2022,name:"Yurov Danila",pos:"A",team:"MIN"},{num:6,year:2022,name:"Chesley Ryan",pos:"D",team:"WAS"},{num:7,year:2023,name:"Benson Zachary",pos:"A",team:"BUF"},{num:8,year:2023,name:"Willander Tom",pos:"D",team:"VAN"},{num:9,year:2023,name:"Wood Matthew",pos:"A",team:"NAS"},{num:10,year:2023,name:"Stenberg Otto",pos:"A",team:"STL"},{num:11,year:2023,name:"Edstrom David",pos:"A",team:"VGS"},{num:12,year:2024,name:"Helenius Konsta",pos:"A",team:"BUF"},{num:13,year:2024,name:"Connelly Trevor",pos:"A",team:"VGK"},{num:14,year:2024,name:"Surin Yegor",pos:"A",team:"NSH"},{num:15,year:2024,name:"Emery E.J.",pos:"D",team:"NYR"},{num:16,year:2024,name:"Danford Ben",pos:"D",team:"TOR"},{num:17,year:2024,name:"Chernyshov Igor",pos:"A",team:"SJS"},{num:18,year:2024,name:"Badinka Dominik",pos:"D",team:"CAR"},{num:19,year:2025,name:"Desnoyers Caleb",pos:"A",team:"UTH"},{num:20,year:2025,name:"McQueen Roger",pos:"A",team:"ANA"},{num:21,year:2025,name:"Andreyanov Pyotr",pos:"G",team:"CLB"},{num:22,year:2025,name:"Nestrasil Vaclav",pos:"A",team:"CHI"},{num:23,year:2025,name:"Amico Carter",pos:"D",team:"PHI"}], picks:[] },
   { nhl:"Winnipeg Jets", dg:"Karl Lagace", masse:131028571, roster:{ G:[{name:"Gustavsson Filip",salary:6800000}], D:[{name:"Hamilton Dougie",salary:9000000},{name:"Hutson Lane",salary:8850000},{name:"Sergachev Mikhail",salary:8500000},{name:"Hronek Filip",salary:7250000},{name:"Samuelsson Mathias",salary:4285714},{name:"Gostisbehere Shayne",salary:3200000},{name:"Spence Jordan",salary:5000000}], A:[{name:"Panarin Artemi",salary:11642857},{name:"Tuck Alex",salary:10500000},{name:"Cooley Logan",salary:10000000},{name:"Kucherov Nikita",salary:9500000},{name:"Crosby Sidney",salary:8700000},{name:"Scheifele Mark",salary:8500000},{name:"Suzuki Nick",salary:7875000},{name:"Malkin Evgeny",salary:5500000},{name:"Nugent-Hopkins Ryan",salary:5125000},{name:"Johansson Marcus",salary:800000},{name:"Robertson Jason",salary:"RFA"},{name:"Perfetti Cole",salary:6000000}] }, prospects:[{num:1,year:2021,name:"Wallstedt Jesper",pos:"G",team:"MIN"},{num:2,year:2021,name:"Raty Aatu",pos:"A",team:"NYI"},{num:3,year:2022,name:"Kasper Marco",pos:"A",team:"DET"},{num:4,year:2022,name:"Ostlund Noah",pos:"A",team:"BUF"},{num:5,year:2022,name:"Lamoureux Maverick",pos:"D",team:"ARI"},{num:6,year:2022,name:"Lutz Julian",pos:"A",team:"ARI"},{num:7,year:2023,name:"Michkov Matvei",pos:"A",team:"PHI"},{num:8,year:2023,name:"Sandin-Pellikka Axel",pos:"D",team:"DET"},{num:9,year:2023,name:"Moore Oliver",pos:"A",team:"CHI"},{num:10,year:2023,name:"Gajan Adam",pos:"G",team:"CHI"},{num:11,year:2023,name:"Cataford Mathieu",pos:"A",team:"VEG"},{num:12,year:2024,name:"Catton Berkley",pos:"A",team:"SEA"},{num:13,year:2024,name:"Hage Michael",pos:"A",team:"MTL"},{num:14,year:2024,name:"Letourneau Dean",pos:"A",team:"BOS"},{num:15,year:2024,name:"Sahlin-Wallenius Leo",pos:"D",team:"SJ"},{num:16,year:2024,name:"Gridin Matvei",pos:"A",team:"CAL"},{num:17,year:2024,name:"Pettersson Lucas",pos:"A",team:"ANA"},{num:18,year:2025,name:"Smith Jackson",pos:"D",team:"CLB"},{num:19,year:2025,name:"Reid Cameron",pos:"D",team:"NAS"},{num:20,year:2025,name:"West Mason",pos:"D",team:"CHI"},{num:21,year:2025,name:"Zonnon Bill",pos:"A",team:"PIT"},{num:22,year:2025,name:"Medvedev Alexei",pos:"G",team:"VAN"},{num:23,year:2025,name:"Czata Ethan",pos:"A",team:"TB"},{num:24,year:2025,name:"D'Aigle Gabriel",pos:"G",team:"PIT"},{num:25,year:2025,name:"McKinney Cole",pos:"A",team:"SJ"}], picks:[] },
-  { nhl:"Florida Panthers", dg:"Pier-Luc Faucher", masse:107231660, roster:{ G:[{name:"Wolf Dustin",salary:7500000},{name:"Quick Jonathan",salary:1550000}], D:[{name:"Carlson John",salary:8500000},{name:"Dunn Vince",salary:7350000},{name:"Morrissey Josh",salary:6250000},{name:"Matheson Mike",salary:6000000},{name:"Manson Josh",salary:3950000},{name:"Burns Brent",salary:850000},{name:"Schaefer Matthew",salary:975000},{name:"Matheychuk Denton",salary:886666}], A:[{name:"McDavid Connor",salary:12500000},{name:"Ovechkin Alex",salary:9500000},{name:"Zibanejad Mika",salary:8500000},{name:"Tkachuk Brady",salary:8205714},{name:"DeBrincat Alex",salary:7875000},{name:"Caufield Cole",salary:7850000},{name:"Rust Bryan",salary:5125000},{name:"Lehkonen Artturi",salary:4500000},{name:"Tavares John",salary:4389280},{name:"Mantha Anthony",salary:2500000},{name:"Fantilli Adam",salary:"RFA"},{name:"Celebrini Mack",salary:975000}] }, prospects:[{num:1,year:2021,name:"Olausson Oskar",pos:"A",team:"COL"},{num:2,year:2021,name:"Morrow Scott",pos:"D",team:"CAR"},{num:3,year:2022,name:"Wright Shane",pos:"A",team:"SEA"},{num:4,year:2022,name:"Pickering Owen",pos:"D",team:"PIT"},{num:5,year:2022,name:"Hugues Jack",pos:"A",team:"LAK"},{num:6,year:2023,name:"Yager Brayden",pos:"A",team:"PIT"},{num:7,year:2023,name:"Bonk Oliver",pos:"D",team:"PHI"},{num:8,year:2023,name:"Gulyayev Mikhail",pos:"G",team:"COL"},{num:9,year:2023,name:"Augustine Trey",pos:"G",team:"DET"},{num:10,year:2023,name:"Dvorak Jakub",pos:"D",team:"LAK"},{num:11,year:2023,name:"Dragicevic Lukas",pos:"D",team:"SEA"},{num:12,year:2024,name:"Silayev Anton",pos:"D",team:"NJD"},{num:13,year:2024,name:"Eiserman Cole",pos:"A",team:"NYI"},{num:14,year:2024,name:"O'Reilly Sam",pos:"A",team:"EDM"},{num:15,year:2024,name:"Nabokov Ilya",pos:"G",team:"COL"},{num:16,year:2024,name:"Hutson Cole",pos:"D",team:"WAS"},{num:17,year:2025,name:"Zharovsky Alexander",pos:"A",team:"MTL"},{num:18,year:2025,name:"Bear Carter",pos:"A",team:"CHI"},{num:19,year:2025,name:"Potter Cullen",pos:"A",team:"CGY"},{num:20,year:2025,name:"Wang Haoxi",pos:"D",team:"SJS"},{num:21,year:2025,name:"Moore Will",pos:"A",team:"BOS"},{num:22,year:2025,name:"Genborg Eddie",pos:"A",team:"DET"},{num:23,year:2025,name:"Gard Matthew",pos:"A",team:"PHI"},{num:24,year:2025,name:"Paupanekis Hayden",pos:"A",team:"MTL"}], picks:[] },
-  { nhl:"Colorado Avalanche", dg:"Sebastien Martin", masse:113784000, roster:{ G:[{name:"Bussi Brandon",salary:775000}], D:[{name:"Bouchard Evan",salary:10500000},{name:"Josi Roman",salary:9059000},{name:"Faulk Justin",salary:6500000},{name:"Walman Jake",salary:3400000},{name:"Lohrei Mason",salary:3200000},{name:"Nikishin Alexander",salary:925000},{name:"Shea Ryan",salary:900000},{name:"Mintyukov Pavel",salary:7200000}], A:[{name:"Aho Sebastian",salary:9750000},{name:"Reinhart Sam",salary:8625000},{name:"Stützle Tim",salary:8350000},{name:"Slafkovsky Juraj",salary:7600000},{name:"Hischier Nico",salary:11700000},{name:"Terry Troy",salary:7000000},{name:"Schmaltz Nick",salary:5850000},{name:"Kempe Adrian",salary:5500000},{name:"Marchand Brad",salary:5250000},{name:"Marchenko Kirill",salary:3850000},{name:"Duchene Matt",salary:4500000},{name:"Rakell Ricard",salary:5000000}] }, prospects:[{num:1,year:2021,name:"Coronato Matt",pos:"A",team:"CGY"},{num:2,year:2021,name:"Samoskevich Matthew",pos:"A",team:"FLO"},{num:3,year:2021,name:"Sillinger Cole",pos:"A",team:"CLB"},{num:4,year:2022,name:"Nazar Frank",pos:"A",team:"CHI"},{num:5,year:2022,name:"McGroarty Rutger",pos:"A",team:"PIT"},{num:6,year:2022,name:"Ohgren Liam",pos:"A",team:"MIN"},{num:7,year:2022,name:"Rinzel Sam",pos:"D",team:"CHI"},{num:8,year:2022,name:"Schaefer Reid",pos:"A",team:"EDM"},{num:9,year:2022,name:"Lund Cam",pos:"A",team:"SJS"},{num:10,year:2022,name:"Duda Artyom",pos:"D",team:"UTAH"},{num:11,year:2022,name:"Havelid Mattias",pos:"D",team:"SJS"},{num:12,year:2023,name:"Leonard Ryan",pos:"A",team:"WSH"},{num:13,year:2023,name:"Honzek Samuel",pos:"A",team:"CGY"},{num:14,year:2023,name:"Cowan Easton",pos:"A",team:"TOR"},{num:15,year:2023,name:"Molendyk Tanner",pos:"D",team:"NSH"},{num:16,year:2023,name:"Nadeau Bradley",pos:"A",team:"CAR"},{num:17,year:2024,name:"Iginla Tij",pos:"A",team:"UTAH"},{num:18,year:2024,name:"Boisvert Sacha",pos:"A",team:"CHI"},{num:19,year:2024,name:"Beaudoin Cole",pos:"A",team:"UTAH"},{num:20,year:2024,name:"Solberg Stian",pos:"D",team:"ANA"},{num:21,year:2025,name:"Frondell Anton",pos:"A",team:"CHI"},{num:22,year:2025,name:"Nesbitt Jack",pos:"A",team:"PHI"},{num:23,year:2025,name:"Fiddler Blake",pos:"D",team:"SEA"},{num:24,year:2025,name:"Stockselius Theo",pos:"A",team:"CGY"}], picks:[] },
+  { nhl:"Florida Panthers", dg:"Pier-Luc Faucher", masse:107231660, roster:{ G:[{name:"Wolf Dustin",salary:7500000},{name:"Quick Jonathan",salary:1550000}], D:[{name:"Carlson John",salary:8500000},{name:"Dunn Vince",salary:7350000},{name:"Morrissey Josh",salary:6250000},{name:"Matheson Mike",salary:6000000},{name:"Manson Josh",salary:3950000},{name:"Burns Brent",salary:850000},{name:"Schaefer Matthew",salary:975000},{name:"Matheychuk Denton",salary:886666}], A:[{name:"McDavid Connor",salary:12500000},{name:"Ovechkin Alex",salary:4250000},{name:"Zibanejad Mika",salary:8500000},{name:"Tkachuk Brady",salary:8205714},{name:"DeBrincat Alex",salary:7875000},{name:"Caufield Cole",salary:7850000},{name:"Rust Bryan",salary:5125000},{name:"Lehkonen Artturi",salary:4500000},{name:"Tavares John",salary:4389280},{name:"Mantha Anthony",salary:2500000},{name:"Fantilli Adam",salary:"RFA"},{name:"Celebrini Mack",salary:975000}] }, prospects:[{num:1,year:2021,name:"Olausson Oskar",pos:"A",team:"COL"},{num:2,year:2021,name:"Morrow Scott",pos:"D",team:"CAR"},{num:3,year:2022,name:"Wright Shane",pos:"A",team:"SEA"},{num:4,year:2022,name:"Pickering Owen",pos:"D",team:"PIT"},{num:5,year:2022,name:"Hugues Jack",pos:"A",team:"LAK"},{num:6,year:2023,name:"Yager Brayden",pos:"A",team:"PIT"},{num:7,year:2023,name:"Bonk Oliver",pos:"D",team:"PHI"},{num:8,year:2023,name:"Gulyayev Mikhail",pos:"G",team:"COL"},{num:9,year:2023,name:"Augustine Trey",pos:"G",team:"DET"},{num:10,year:2023,name:"Dvorak Jakub",pos:"D",team:"LAK"},{num:11,year:2023,name:"Dragicevic Lukas",pos:"D",team:"SEA"},{num:12,year:2024,name:"Silayev Anton",pos:"D",team:"NJD"},{num:13,year:2024,name:"Eiserman Cole",pos:"A",team:"NYI"},{num:14,year:2024,name:"O'Reilly Sam",pos:"A",team:"EDM"},{num:15,year:2024,name:"Nabokov Ilya",pos:"G",team:"COL"},{num:16,year:2024,name:"Hutson Cole",pos:"D",team:"WAS"},{num:17,year:2025,name:"Zharovsky Alexander",pos:"A",team:"MTL"},{num:18,year:2025,name:"Bear Carter",pos:"A",team:"CHI"},{num:19,year:2025,name:"Potter Cullen",pos:"A",team:"CGY"},{num:20,year:2025,name:"Wang Haoxi",pos:"D",team:"SJS"},{num:21,year:2025,name:"Moore Will",pos:"A",team:"BOS"},{num:22,year:2025,name:"Genborg Eddie",pos:"A",team:"DET"},{num:23,year:2025,name:"Gard Matthew",pos:"A",team:"PHI"},{num:24,year:2025,name:"Paupanekis Hayden",pos:"A",team:"MTL"}], picks:[] },
+  { nhl:"Colorado Avalanche", dg:"Sebastien Martin", masse:113784000, roster:{ G:[{name:"Bussi Brandon",salary:1900000}], D:[{name:"Bouchard Evan",salary:10500000},{name:"Josi Roman",salary:9059000},{name:"Faulk Justin",salary:6500000},{name:"Walman Jake",salary:3400000},{name:"Lohrei Mason",salary:3200000},{name:"Nikishin Alexander",salary:"RFA"},{name:"Shea Ryan",salary:4000000},{name:"Mintyukov Pavel",salary:7200000}], A:[{name:"Aho Sebastian",salary:9750000},{name:"Reinhart Sam",salary:8625000},{name:"Stützle Tim",salary:8350000},{name:"Slafkovsky Juraj",salary:7600000},{name:"Hischier Nico",salary:11700000},{name:"Terry Troy",salary:7000000},{name:"Schmaltz Nick",salary:5850000},{name:"Kempe Adrian",salary:5500000},{name:"Marchand Brad",salary:5250000},{name:"Marchenko Kirill",salary:3850000},{name:"Duchene Matt",salary:4500000},{name:"Rakell Ricard",salary:5000000}] }, prospects:[{num:1,year:2021,name:"Coronato Matt",pos:"A",team:"CGY"},{num:2,year:2021,name:"Samoskevich Matthew",pos:"A",team:"FLO"},{num:3,year:2021,name:"Sillinger Cole",pos:"A",team:"CLB"},{num:4,year:2022,name:"Nazar Frank",pos:"A",team:"CHI"},{num:5,year:2022,name:"McGroarty Rutger",pos:"A",team:"PIT"},{num:6,year:2022,name:"Ohgren Liam",pos:"A",team:"MIN"},{num:7,year:2022,name:"Rinzel Sam",pos:"D",team:"CHI"},{num:8,year:2022,name:"Schaefer Reid",pos:"A",team:"EDM"},{num:9,year:2022,name:"Lund Cam",pos:"A",team:"SJS"},{num:10,year:2022,name:"Duda Artyom",pos:"D",team:"UTAH"},{num:11,year:2022,name:"Havelid Mattias",pos:"D",team:"SJS"},{num:12,year:2023,name:"Leonard Ryan",pos:"A",team:"WSH"},{num:13,year:2023,name:"Honzek Samuel",pos:"A",team:"CGY"},{num:14,year:2023,name:"Cowan Easton",pos:"A",team:"TOR"},{num:15,year:2023,name:"Molendyk Tanner",pos:"D",team:"NSH"},{num:16,year:2023,name:"Nadeau Bradley",pos:"A",team:"CAR"},{num:17,year:2024,name:"Iginla Tij",pos:"A",team:"UTAH"},{num:18,year:2024,name:"Boisvert Sacha",pos:"A",team:"CHI"},{num:19,year:2024,name:"Beaudoin Cole",pos:"A",team:"UTAH"},{num:20,year:2024,name:"Solberg Stian",pos:"D",team:"ANA"},{num:21,year:2025,name:"Frondell Anton",pos:"A",team:"CHI"},{num:22,year:2025,name:"Nesbitt Jack",pos:"A",team:"PHI"},{num:23,year:2025,name:"Fiddler Blake",pos:"D",team:"SEA"},{num:24,year:2025,name:"Stockselius Theo",pos:"A",team:"CGY"}], picks:[] },
   { nhl:"Tampa Bay Lightning", dg:"Eric Turgeon", masse:115054875, roster:{ G:[{name:"Greaves Jett",salary:"RFA"}], D:[{name:"Harley Thomas",salary:10587000},{name:"Hughes Luke",salary:9000000},{name:"Sanderson Jake",salary:8050000},{name:"Hughes Quinton",salary:7850000},{name:"Rielly Morgan",salary:7500000},{name:"Clarke Brandt",salary:7400000}], A:[{name:"Connor Kyle",salary:12000000},{name:"Pastrnak David",salary:11250000},{name:"Konecny Travis",salary:8750000},{name:"Forsberg Filip",salary:8500000},{name:"Keller Clayton",salary:7150000},{name:"Guenther Dylan",salary:7142875},{name:"Wilson Tom",salary:6500000},{name:"Protas Aleksei",salary:3375000},{name:"Carlson Léo",salary:18000000}] }, prospects:[{num:1,year:2021,name:"Korchinski Kevin",pos:"D",team:"CHI"},{num:2,year:2021,name:"Beck Owen",pos:"A",team:"MTL"},{num:3,year:2022,name:"Kyrou Christian",pos:"D",team:"DAL"},{num:4,year:2022,name:"Nelson Ty",pos:"D",team:"SEA"},{num:5,year:2022,name:"Bystedt Filip",pos:"A",team:"SJ"},{num:6,year:2023,name:"Musty Quentin",pos:"A",team:"SJ"},{num:7,year:2023,name:"Morin Etienne",pos:"D",team:"CGY"},{num:8,year:2023,name:"Gibson Andrew",pos:"D",team:"DET"},{num:9,year:2024,name:"Yakemchuk Carter",pos:"D",team:"OTT"},{num:10,year:2024,name:"Buuim Zeev",pos:"D",team:"MIN"},{num:11,year:2024,name:"Brandsegg-Nygard Michael",pos:"A",team:"DET"},{num:12,year:2024,name:"Vanacker Marik",pos:"A",team:"CHI"},{num:13,year:2024,name:"Smith Tarin",pos:"D",team:"ANA"},{num:14,year:2024,name:"Marelli Luca",pos:"D",team:"CLB"},{num:15,year:2025,name:"Hensler Logan",pos:"D",team:"OTT"},{num:16,year:2025,name:"Boumedienne Sasha",pos:"D",team:"WINN"},{num:17,year:2025,name:"Lee Ryker",pos:"A",team:"NASH"},{num:18,year:2025,name:"Schmidt Cameron",pos:"A",team:"DAL"},{num:19,year:2025,name:"Cerrato Charlie",pos:"A",team:"CAR"},{num:20,year:2025,name:"Behm Nathan",pos:"A",team:"CHI"},{num:21,year:2025,name:"Reade Noah",pos:"A",team:"ANA"},{num:22,year:2025,name:"Murtag Jack",pos:"A",team:"PHI"},{num:23,year:2025,name:"Moses Shamar",pos:"A",team:"FLO"}], picks:[] },
-  { nhl:"Vegas Golden Knights", dg:"Zack Lagace", masse:135125000, roster:{ G:[{name:"Blackwood Mackenzie",salary:5250000}], D:[{name:"Raddysh Darren",salary:8500000},{name:"Weegar Mackenzie",salary:6250000},{name:"Byram Bowen",salary:6250000},{name:"Moser J.J.",salary:6750000},{name:"Anderson Rasmus",salary:8500000},{name:"Edvinson Simon",salary:"RFA"}], A:[{name:"Pettersen Elias",salary:11600000},{name:"Rantanen Mikko",salary:12000000},{name:"Stone Mark",salary:9500000},{name:"Larkin Dylan",salary:8700000},{name:"Hintz Roope",salary:8450000},{name:"Horvat Bo",salary:8500000},{name:"Zegras Trevor",salary:9125000},{name:"Batherson Drake",salary:4975000},{name:"Bratt Jesper",salary:7875000},{name:"Byfield Quinton",salary:6250000},{name:"Evangelista Luke",salary:3000000},{name:"Johnson Kent",salary:1800000},{name:"Graff Collin",salary:"RFA"},{name:"Barkov Alexander",salary:10000000},{name:"Tkachuk Matthew",salary:9500000},{name:"Doan Josh",salary:6950000}] }, prospects:[{num:1,year:2022,name:"Bishel Liam",pos:"D",team:"DAL"},{num:2,year:2023,name:"Danielson Nate",pos:"A",team:"DET"},{num:3,year:2025,name:"Misa Michael",pos:"A",team:"SJS"},{num:4,year:2025,name:"Kindell Benjamin",pos:"A",team:"PIT"},{num:5,year:2025,name:"Carbonneau Justin",pos:"A",team:"STL"},{num:6,year:2025,name:"Horcoff William",pos:"A",team:"PIT"},{num:7,year:2025,name:"Mooney LJ",pos:"A",team:"MTL"},{num:8,year:2025,name:"Ivankovic Jack",pos:"G",team:"NSH"},{num:9,year:2025,name:"Gastrin Milton",pos:"A",team:"STL"},{num:10,year:2025,name:"Kettles Peyton",pos:"D",team:"PIT"},{num:11,year:2025,name:"Guité Émile",pos:"A",team:"ANA"},{num:12,year:2025,name:"Hoch Stepan",pos:"A",team:"UTA"},{num:13,year:2025,name:"Lakovic Landon",pos:"A",team:"WSH"},{num:14,year:2025,name:"Pickford Bryce",pos:"D",team:"MTL"}], picks:[{round:1,dg:"Karl",year:"Fév. 2026"}] },
+  { nhl:"Vegas Golden Knights", dg:"Zack Lagace", masse:135125000, roster:{ G:[{name:"Blackwood Mackenzie",salary:5250000}], D:[{name:"Raddysh Darren",salary:8500000},{name:"Weegar Mackenzie",salary:6250000},{name:"Byram Bowen",salary:6125000},{name:"Moser J.J.",salary:6750000},{name:"Anderson Rasmus",salary:8500000},{name:"Edvinson Simon",salary:"RFA"}], A:[{name:"Pettersen Elias",salary:11600000},{name:"Rantanen Mikko",salary:12000000},{name:"Stone Mark",salary:9500000},{name:"Larkin Dylan",salary:8700000},{name:"Hintz Roope",salary:8450000},{name:"Horvat Bo",salary:8500000},{name:"Zegras Trevor",salary:9125000},{name:"Batherson Drake",salary:4975000},{name:"Bratt Jesper",salary:7875000},{name:"Byfield Quinton",salary:6250000},{name:"Evangelista Luke",salary:3000000},{name:"Johnson Kent",salary:1800000},{name:"Graff Collin",salary:"RFA"},{name:"Barkov Alexander",salary:10000000},{name:"Tkachuk Matthew",salary:9500000},{name:"Doan Josh",salary:6950000}] }, prospects:[{num:1,year:2022,name:"Bishel Liam",pos:"D",team:"DAL"},{num:2,year:2023,name:"Danielson Nate",pos:"A",team:"DET"},{num:3,year:2025,name:"Misa Michael",pos:"A",team:"SJS"},{num:4,year:2025,name:"Kindell Benjamin",pos:"A",team:"PIT"},{num:5,year:2025,name:"Carbonneau Justin",pos:"A",team:"STL"},{num:6,year:2025,name:"Horcoff William",pos:"A",team:"PIT"},{num:7,year:2025,name:"Mooney LJ",pos:"A",team:"MTL"},{num:8,year:2025,name:"Ivankovic Jack",pos:"G",team:"NSH"},{num:9,year:2025,name:"Gastrin Milton",pos:"A",team:"STL"},{num:10,year:2025,name:"Kettles Peyton",pos:"D",team:"PIT"},{num:11,year:2025,name:"Guité Émile",pos:"A",team:"ANA"},{num:12,year:2025,name:"Hoch Stepan",pos:"A",team:"UTA"},{num:13,year:2025,name:"Lakovic Landon",pos:"A",team:"WSH"},{num:14,year:2025,name:"Pickford Bryce",pos:"D",team:"MTL"}], picks:[{round:1,dg:"Karl",year:"Fév. 2026"}] },
   { nhl:"À déterminer", dg:"Gabriel Asselin", masse:0, roster:{ G:[], D:[], A:[] }, prospects:[], picks:[] }
 ];
 
@@ -508,9 +454,6 @@ function buildTransactionsList() {
 }
 
 // ─── SALARY OVERRIDES (commissaire) ─────────────────────────────────────────
-// Salaires modifiés par le panneau admin, stockés en localStorage, appliqués
-// par-dessus les données de base ci-dessus. Clé: "TeamIndex|PlayerName"
-
 function getSalaryOverrides() {
   try { return JSON.parse(localStorage.getItem('pool-salary-overrides') || '{}'); }
   catch { return {}; }
@@ -530,12 +473,11 @@ function applySalaryOverrides() {
         }
       });
     });
-    // Recalculate masse for this team from individual salaries
     let total = 0;
     ['G','D','A'].forEach(pos => {
       (team.roster[pos] || []).forEach(player => {
         if (typeof player.salary === 'number') total += player.salary;
-        else total += 500000; // RFA/UFA placeholder per règlement
+        else total += 500000;
       });
     });
     team.masse = total;
@@ -594,12 +536,11 @@ window.updateSalary = function() {
   buildOverviewCards('teams-list-nav');
   buildSalaryStandings();
   buildJoueursPrisList();
-  populatePlayerSelect(); // refresh dropdown labels
+  populatePlayerSelect();
 
   document.getElementById('admin-status').textContent = `✅ ${playerName} mis à jour!`;
   setTimeout(() => document.getElementById('admin-status').textContent = '', 2500);
 
-  // If currently viewing this team's detail, refresh it
   const container = document.getElementById('team-detail-container');
   if (container && container.style.display === 'block') {
     container.innerHTML = buildTeamDetail(parseInt(teamIdx));
@@ -769,142 +710,14 @@ function buildSalaryStandings(){
   });
 }
 
-// ── EXPANSION 2026 ──
-const MAX_PROTECTED = 12;
-
-function getExpansionProtections() {
-  try { return JSON.parse(localStorage.getItem('pool-expansion-protections') || '{}'); }
-  catch { return {}; }
-}
-function saveExpansionProtections(obj) {
-  localStorage.setItem('pool-expansion-protections', JSON.stringify(obj));
-}
-
-window.toggleProtection = function(teamIdx, playerName) {
-  const team = teams[teamIdx];
-  const prot = getExpansionProtections();
-  const key = team.nhl;
-  if (!prot[key]) prot[key] = [];
-  const i = prot[key].indexOf(playerName);
-  if (i >= 0) {
-    prot[key].splice(i, 1);
-  } else {
-    if (prot[key].length >= MAX_PROTECTED) {
-      alert(`Maximum ${MAX_PROTECTED} joueurs protégés par équipe.`);
-      buildExpansionTeamsList();
-      return;
-    }
-    prot[key].push(playerName);
-  }
-  saveExpansionProtections(prot);
-  buildExpansionTeamsList();
-  buildExposedPool();
-};
-
-function buildExpansionTeamsList() {
-  const container = document.getElementById('expansion-teams-list');
-  if (!container) return;
-  const prot = getExpansionProtections();
-  container.innerHTML = teams.map((t, ti) => {
-    const protectedList = prot[t.nhl] || [];
-    const count = protectedList.length;
-    const allPlayers = [
-      ...t.roster.G.map(p => ({ ...p, pos: 'G' })),
-      ...t.roster.D.map(p => ({ ...p, pos: 'D' })),
-      ...t.roster.A.map(p => ({ ...p, pos: 'A' }))
-    ];
-    const rows = allPlayers.map(p => {
-      const isProt = protectedList.includes(p.name);
-      const salStr = typeof p.salary === 'number' ? fmt(p.salary) : p.salary;
-      const salClass = p.salary === 'RFA' ? 'rfa' : p.salary === 'UFA' ? 'ufa' : '';
-      const safeName = p.name.replace(/'/g, "\\'");
-      return `<label class="protect-row ${isProt ? 'protected' : ''}">
-        <input type="checkbox" ${isProt ? 'checked' : ''} onchange="toggleProtection(${ti},'${safeName}')">
-        <span class="pos-badge pos-${p.pos}">${p.pos}</span>
-        <span class="protect-name">${p.name}</span>
-        <span class="salary-tag ${salClass}">${salStr}</span>
-      </label>`;
-    }).join('');
-    return `<details class="expansion-team-card">
-      <summary>
-        <span>${t.nhl} <span style="color:#94a3b8;font-weight:600">(${t.dg})</span></span>
-        <span class="expansion-count-badge ${count >= MAX_PROTECTED ? 'full' : ''}">${count}/${MAX_PROTECTED} protégés</span>
-      </summary>
-      <div class="expansion-roster">${rows}</div>
-    </details>`;
-  }).join('');
-}
-
-function buildExposedPool() {
-  const prot = getExpansionProtections();
-  const pool = [];
-  teams.forEach(t => {
-    const protectedList = prot[t.nhl] || [];
-    ['G', 'D', 'A'].forEach(pos => {
-      t.roster[pos].forEach(p => {
-        if (!protectedList.includes(p.name)) {
-          pool.push({ ...p, pos, nhl: t.nhl, dg: t.dg });
-        }
-      });
-    });
-  });
-  window.__exposedPool = pool;
-  filterExposedPool();
-}
-
-function renderExposedTable(pool) {
-  const tbody = document.getElementById('expansion-exposed-body');
-  if (!tbody) return;
-  const sorted = [...pool].sort((a, b) => a.nhl.localeCompare(b.nhl) || a.name.localeCompare(b.name));
-  tbody.innerHTML = sorted.map(p => {
-    const salStr = typeof p.salary === 'number' ? fmt(p.salary) : p.salary;
-    const salClass = p.salary === 'RFA' ? 'rfa' : p.salary === 'UFA' ? 'ufa' : '';
-    return `<tr>
-      <td class="left player-name">${p.name}</td>
-      <td><span class="pos-badge pos-${p.pos}">${p.pos}</span></td>
-      <td><span class="salary-tag ${salClass}">${salStr}</span></td>
-      <td class="left">${p.nhl} <span style="color:#94a3b8;font-size:12px">(${p.dg})</span></td>
-    </tr>`;
-  }).join('') || '<tr><td colspan="4" style="text-align:center;padding:24px;color:#94a3b8">Aucun joueur exposé</td></tr>';
-}
-
-window.filterExposedPool = function() {
-  const q = (document.getElementById('expansion-search')?.value || '').trim().toLowerCase();
-  const teamFilter = document.getElementById('expansion-team-filter')?.value || '';
-  const posFilter = document.getElementById('expansion-pos-filter')?.value || '';
-  let pool = window.__exposedPool || [];
-  if (teamFilter) pool = pool.filter(p => p.nhl === teamFilter);
-  if (posFilter) pool = pool.filter(p => p.pos === posFilter);
-  if (q) pool = pool.filter(p => p.name.toLowerCase().includes(q));
-  renderExposedTable(pool);
-};
-
-function populateExpansionTeamFilter() {
-  const sel = document.getElementById('expansion-team-filter');
-  if (!sel || sel.dataset.filled) return;
-  teams.forEach(t => {
-    const opt = document.createElement('option');
-    opt.value = t.nhl; opt.textContent = t.nhl;
-    sel.appendChild(opt);
-  });
-  sel.dataset.filled = '1';
-}
-
-function buildExpansionTab() {
-  populateExpansionTeamFilter();
-  buildExpansionTeamsList();
-  buildExposedPool();
-}
-
 function showTab(id){
   document.querySelectorAll('.tab-content').forEach(el=>el.style.display='none');
   document.querySelectorAll('.nav-tab').forEach(btn=>btn.classList.remove('active'));
   document.getElementById('tab-'+id).style.display='block';
-  const tabs=['equipes','transactions','classement','recrues-prises','joueurs-pris','reglements','expansion-2026'];
+  const tabs=['equipes','transactions','classement','recrues-prises','joueurs-pris','reglements'];
   document.querySelectorAll('.nav-tab')[tabs.indexOf(id)].classList.add('active');
   if(id==='equipes'){document.getElementById('team-list-view').style.display='grid';document.getElementById('team-detail-container').innerHTML='';document.getElementById('team-detail-container').style.display='none';}
   if(id==='classement' && !window.__ptsLoadedOnce){ window.__ptsLoadedOnce = true; loadAllPlayerStats(); }
-  if(id==='expansion-2026' && !window.__expansionLoadedOnce){ window.__expansionLoadedOnce = true; buildExpansionTab(); }
 }
 
 applySalaryOverrides();
@@ -923,49 +736,49 @@ const PTS_TEAMS = [
     dg: "Gabriel Plante",
     nhl: "Montréal Canadiens",
     players: [
-      {name:"Oettinger Jake", id:8480045, pos:"G"},
+      {name:"Oettinger Jake", id:8479979, pos:"G"},
       {name:"Fox Adam", id:8479323, pos:"D"},
-      {name:"Faber Brock", id:8482175, pos:"D"},
-      {name:"Chabot Thomas", id:8479977, pos:"D"},
-      {name:"Forsling Gustav", id:8478009, pos:"D"},
-      {name:"Malinski Sam", id:8483490, pos:"D"},
-      {name:"Jiricek David", id:8483524, pos:"D"},
-      {name:"Casey Seamus", id:8484887, pos:"D"},
-      {name:"D'Astous Charle-Édouard", id:8484465, pos:"D"},
-      {name:"York Cam", id:8482762, pos:"D"},
+      {name:"Faber Brock", id:8482122, pos:"D"},
+      {name:"Chabot Thomas", id:8478469, pos:"D"},
+      {name:"Forsling Gustav", id:8478055, pos:"D"},
+      {name:"Malinski Sam", id:8484258, pos:"D"},
+      {name:"Jiricek David", id:8483460, pos:"D"},
+      {name:"Casey Seamus", id:8483429, pos:"D"},
+      {name:"D'Astous Charle-Édouard", id:8480426, pos:"D"},
+      {name:"York Cam", id:8481546, pos:"D"},
       {name:"Draisaitl Leon", id:8477934, pos:"A"},
       {name:"Eichel Jack", id:8478403, pos:"A"},
-      {name:"Barzal Matthew", id:8480768, pos:"A"},
+      {name:"Barzal Matthew", id:8478445, pos:"A"},
       {name:"Raymond Lucas", id:8482078, pos:"A"},
       {name:"Beniers Matthew", id:8482665, pos:"A"},
-      {name:"Boldy Matthew", id:8481533, pos:"A"},
+      {name:"Boldy Matthew", id:8481557, pos:"A"},
       {name:"Lundell Anton", id:8482113, pos:"A"},
-      {name:"Stankoven Logan", id:8483604, pos:"A"},
-      {name:"McCann Jared", id:8476473, pos:"A"},
-      {name:"Bowman Braeden", id:8484148, pos:"A"},
+      {name:"Stankoven Logan", id:8482702, pos:"A"},
+      {name:"McCann Jared", id:8477955, pos:"A"},
+      {name:"Bowman Braeden", id:8483890, pos:"A"},
     ]
   },
   {
     dg: "Philippe Rainville",
     nhl: "Edmonton Oilers",
     players: [
-      {name:"Vejmelka Karel", id:8481602, pos:"G"},
-      {name:"McAvoy Charlie", id:8480794, pos:"D"},
-      {name:"Dobson Noah", id:8481533, pos:"D"},
-      {name:"Seider Moritz", id:8482476, pos:"D"},
-      {name:"Theodore Shea", id:8478476, pos:"D"},
-      {name:"Lacombe Jackson", id:8482703, pos:"D"},
+      {name:"Vejmelka Karel", id:8478872, pos:"G"},
+      {name:"McAvoy Charlie", id:8479325, pos:"D"},
+      {name:"Dobson Noah", id:8480865, pos:"D"},
+      {name:"Seider Moritz", id:8481542, pos:"D"},
+      {name:"Theodore Shea", id:8477447, pos:"D"},
+      {name:"Lacombe Jackson", id:8481605, pos:"D"},
       {name:"Marner Mitchell", id:8478483, pos:"A"},
       {name:"Nylander William", id:8477939, pos:"A"},
       {name:"Point Braydon", id:8478010, pos:"A"},
-      {name:"Kyrou Jordan", id:8480762, pos:"A"},
+      {name:"Kyrou Jordan", id:8479385, pos:"A"},
       {name:"Miller J.T.", id:8476468, pos:"A"},
       {name:"Svechnikov Andrei", id:8480830, pos:"A"},
-      {name:"Holloway Dylan", id:8482074, pos:"A"},
-      {name:"McTavish Mason", id:8483533, pos:"A"},
-      {name:"Geekie Morgan", id:8480762, pos:"A"},
-      {name:"Blake Jackson", id:8481523, pos:"A"},
-      {name:"Neighbours Jake", id:8482711, pos:"A"},
+      {name:"Holloway Dylan", id:8482077, pos:"A"},
+      {name:"McTavish Mason", id:8482745, pos:"A"},
+      {name:"Geekie Morgan", id:8479987, pos:"A"},
+      {name:"Blake Jackson", id:8482809, pos:"A"},
+      {name:"Neighbours Jake", id:8482089, pos:"A"},
       {name:"Bédard Connor", id:8484144, pos:"A"},
     ]
   },
@@ -973,24 +786,24 @@ const PTS_TEAMS = [
     dg: "Philippe Desrochers",
     nhl: "Dallas Stars",
     players: [
-      {name:"Wedgewood Scott", id:8476391, pos:"G"},
+      {name:"Wedgewood Scott", id:8475809, pos:"G"},
       {name:"Karlsson Erik", id:8474578, pos:"D"},
-      {name:"Dahlin Rasmus", id:8480787, pos:"D"},
-      {name:"Werenski Zach", id:8478432, pos:"D"},
-      {name:"Heiskanen Miro", id:8480764, pos:"D"},
+      {name:"Dahlin Rasmus", id:8480839, pos:"D"},
+      {name:"Werenski Zach", id:8478460, pos:"D"},
+      {name:"Heiskanen Miro", id:8480036, pos:"D"},
       {name:"Hedman Victor", id:8475167, pos:"D"},
-      {name:"Kaprizov Kirill", id:8481600, pos:"A"},
+      {name:"Kaprizov Kirill", id:8478864, pos:"A"},
       {name:"MacKinnon Nathan", id:8477492, pos:"A"},
-      {name:"Thomas Robert", id:8480762, pos:"A"},
-      {name:"Knies Matthew", id:8483457, pos:"A"},
+      {name:"Thomas Robert", id:8480023, pos:"A"},
+      {name:"Knies Matthew", id:8482720, pos:"A"},
       {name:"Nelson Brock", id:8475754, pos:"A"},
-      {name:"Vilardi Gabe", id:8480762, pos:"A"},
-      {name:"Hagel Brandon", id:8480795, pos:"A"},
-      {name:"Strome Dylan", id:8477951, pos:"A"},
-      {name:"Rossi Marco", id:8482116, pos:"A"},
+      {name:"Vilardi Gabe", id:8480014, pos:"A"},
+      {name:"Hagel Brandon", id:8479542, pos:"A"},
+      {name:"Strome Dylan", id:8478440, pos:"A"},
+      {name:"Rossi Marco", id:8482079, pos:"A"},
     ]
   },
-{
+  {
     dg: "Gabriel",
     nhl: "Carolina Hurricanes",
     players: [
@@ -1017,262 +830,137 @@ const PTS_TEAMS = [
     dg: "Karl Lagace",
     nhl: "Winnipeg Jets",
     players: [
-      {name:"Gustavsson Filip", id:8481600, pos:"G"},
-      {name:"Hamilton Dougie", id:8476456, pos:"D"},
-      {name:"Hutson Lane", id:8484144, pos:"D"},
-      {name:"Sergachev Mikhail", id:8480315, pos:"D"},
-      {name:"Hronek Filip", id:8480762, pos:"D"},
-      {name:"Samuelsson Mathias", id:8482703, pos:"D"},
-      {name:"Gostisbehere Shayne", id:8477474, pos:"D"},
-      {name:"Spence Jordan", id:8483533, pos:"D"},
+      {name:"Gustavsson Filip", id:8479406, pos:"G"},
+      {name:"Hamilton Dougie", id:8476462, pos:"D"},
+      {name:"Hutson Lane", id:8483457, pos:"D"},
+      {name:"Sergachev Mikhail", id:8479410, pos:"D"},
+      {name:"Hronek Filip", id:8479425, pos:"D"},
+      {name:"Samuelsson Mathias", id:8480807, pos:"D"},
+      {name:"Gostisbehere Shayne", id:8476906, pos:"D"},
+      {name:"Spence Jordan", id:8481606, pos:"D"},
       {name:"Panarin Artemi", id:8478550, pos:"A"},
-      {name:"Tuck Alex", id:8481730, pos:"A"},
-      {name:"Cooley Logan", id:8483492, pos:"A"},
+      {name:"Tuck Alex", id:8477949, pos:"A"},
+      {name:"Cooley Logan", id:8483431, pos:"A"},
       {name:"Kucherov Nikita", id:8476453, pos:"A"},
       {name:"Crosby Sidney", id:8471675, pos:"A"},
-      {name:"Scheifele Mark", id:8475716, pos:"A"},
-      {name:"Suzuki Nick", id:8480785, pos:"A"},
+      {name:"Scheifele Mark", id:8476460, pos:"A"},
+      {name:"Suzuki Nick", id:8480018, pos:"A"},
       {name:"Malkin Evgeny", id:8471215, pos:"A"},
-      {name:"Nugent-Hopkins Ryan", id:8475793, pos:"A"},
-      {name:"Johansson Marcus", id:8475765, pos:"A"},
-      {name:"Robertson Jason", id:8481528, pos:"A"},
+      {name:"Nugent-Hopkins Ryan", id:8476454, pos:"A"},
+      {name:"Johansson Marcus", id:8475149, pos:"A"},
+      {name:"Robertson Jason", id:8480027, pos:"A"},
     ]
   },
   {
     dg: "Pier-Luc Faucher",
     nhl: "Florida Panthers",
     players: [
-      {name:"Wolf Dustin", id:8482481, pos:"G"},
-      {name:"Quick Jonathan", id:8470594, pos:"G"},
-      {name:"Dunn Vince", id:8478420, pos:"D"},
-      {name:"Morrissey Josh", id:8478476, pos:"D"},
-      {name:"Matheson Mike", id:8477441, pos:"D"},
-      {name:"Manson Josh", id:8476436, pos:"D"},
-      {name:"Burns Brent", id:8470771, pos:"D"},
-      {name:"Schaefer Matthew", id:8484967, pos:"D"},
-      {name:"Matheychuk Denton", id:8484880, pos:"D"},
+      {name:"Wolf Dustin", id:8481692, pos:"G"},
+      {name:"Quick Jonathan", id:8471734, pos:"G"},
+      {name:"Dunn Vince", id:8478407, pos:"D"},
+      {name:"Morrissey Josh", id:8477504, pos:"D"},
+      {name:"Matheson Mike", id:8476875, pos:"D"},
+      {name:"Manson Josh", id:8476312, pos:"D"},
+      {name:"Burns Brent", id:8470613, pos:"D"},
+      {name:"Schaefer Matthew", id:8485366, pos:"D"},
+      {name:"Matheychuk Denton", id:8483485, pos:"D"},
       {name:"McDavid Connor", id:8478402, pos:"A"},
       {name:"Ovechkin Alex", id:8471214, pos:"A"},
       {name:"Zibanejad Mika", id:8476459, pos:"A"},
       {name:"Tkachuk Brady", id:8480801, pos:"A"},
-      {name:"DeBrincat Alex", id:8480762, pos:"A"},
-      {name:"Caufield Cole", id:8481600, pos:"A"},
-      {name:"Rust Bryan", id:8476792, pos:"A"},
-      {name:"Lehkonen Artturi", id:8478476, pos:"A"},
-      {name:"Tavares John", id:8475154, pos:"A"},
-      {name:"Mantha Anthony", id:8478476, pos:"A"},
-      {name:"Celebrini Mack", id:8484966, pos:"A"},
+      {name:"DeBrincat Alex", id:8479337, pos:"A"},
+      {name:"Caufield Cole", id:8481540, pos:"A"},
+      {name:"Rust Bryan", id:8475810, pos:"A"},
+      {name:"Lehkonen Artturi", id:8477476, pos:"A"},
+      {name:"Tavares John", id:8475166, pos:"A"},
+      {name:"Mantha Anthony", id:8477511, pos:"A"},
+      {name:"Celebrini Mack", id:8484801, pos:"A"},
     ]
   },
   {
     dg: "Sebastien Martin",
     nhl: "Colorado Avalanche",
     players: [
-      {name:"Bussi Brandon", id:8481600, pos:"G"},
-      {name:"Bouchard Evan", id:8480762, pos:"D"},
-      {name:"Josi Roman", id:8474870, pos:"D"},
-      {name:"Faulk Justin", id:8475784, pos:"D"},
-      {name:"Walman Jake", id:8478010, pos:"D"},
-      {name:"Lohrei Mason", id:8483566, pos:"D"},
-      {name:"Nikishin Alexander", id:8482762, pos:"D"},
-      {name:"Shea Ryan", id:8482703, pos:"D"},
+      {name:"Bussi Brandon", id:8483548, pos:"G"},
+      {name:"Bouchard Evan", id:8480803, pos:"D"},
+      {name:"Josi Roman", id:8474600, pos:"D"},
+      {name:"Faulk Justin", id:8475753, pos:"D"},
+      {name:"Walman Jake", id:8478013, pos:"D"},
+      {name:"Lohrei Mason", id:8482511, pos:"D"},
+      {name:"Nikishin Alexander", id:8482100, pos:"D"},
+      {name:"Shea Ryan", id:8478854, pos:"D"},
       {name:"Aho Sebastian", id:8478427, pos:"A"},
       {name:"Reinhart Sam", id:8477933, pos:"A"},
       {name:"Stützle Tim", id:8482116, pos:"A"},
-      {name:"Slafkovsky Juraj", id:8483457, pos:"A"},
-      {name:"Hischier Nico", id:8480762, pos:"A"},
-      {name:"Terry Troy", id:8480762, pos:"A"},
-      {name:"Schmaltz Nick", id:8477411, pos:"A"},
-      {name:"Kempe Adrian", id:8478476, pos:"A"},
+      {name:"Slafkovsky Juraj", id:8483515, pos:"A"},
+      {name:"Hischier Nico", id:8480002, pos:"A"},
+      {name:"Terry Troy", id:8478873, pos:"A"},
+      {name:"Schmaltz Nick", id:8477951, pos:"A"},
+      {name:"Kempe Adrian", id:8477960, pos:"A"},
       {name:"Marchand Brad", id:8473419, pos:"A"},
-      {name:"Marchenko Kirill", id:8482762, pos:"A"},
-      {name:"Duchene Matt", id:8474565, pos:"A"},
-      {name:"Rakell Ricard", id:8476454, pos:"A"},
+      {name:"Marchenko Kirill", id:8480893, pos:"A"},
+      {name:"Duchene Matt", id:8475168, pos:"A"},
+      {name:"Rakell Ricard", id:8476483, pos:"A"},
     ]
   },
   {
     dg: "Eric Turgeon",
     nhl: "Tampa Bay Lightning",
     players: [
-      {name:"Greaves Jett", id:8482762, pos:"G"},
-      {name:"Harley Thomas", id:8481533, pos:"D"},
-      {name:"Hughes Luke", id:8483476, pos:"D"},
-      {name:"Sanderson Jake", id:8482553, pos:"D"},
-      {name:"Hughes Quinton", id:8480830, pos:"D"},
-      {name:"Rielly Morgan", id:8476432, pos:"D"},
-      {name:"Clarke Brandt", id:8483533, pos:"D"},
-      {name:"Connor Kyle", id:8478550, pos:"A"},
+      {name:"Greaves Jett", id:8482982, pos:"G"},
+      {name:"Harley Thomas", id:8481581, pos:"D"},
+      {name:"Hughes Luke", id:8482684, pos:"D"},
+      {name:"Sanderson Jake", id:8482105, pos:"D"},
+      {name:"Hughes Quinton", id:8480800, pos:"D"},
+      {name:"Rielly Morgan", id:8476853, pos:"D"},
+      {name:"Clarke Brandt", id:8482730, pos:"D"},
+      {name:"Connor Kyle", id:8478398, pos:"A"},
       {name:"Pastrnak David", id:8477956, pos:"A"},
-      {name:"Konecny Travis", id:8478445, pos:"A"},
+      {name:"Konecny Travis", id:8478439, pos:"A"},
       {name:"Forsberg Filip", id:8476887, pos:"A"},
-      {name:"Keller Clayton", id:8479365, pos:"A"},
-      {name:"Guenther Dylan", id:8483604, pos:"A"},
-      {name:"Wilson Tom", id:8475831, pos:"A"},
-      {name:"Protas Aleksei", id:8482762, pos:"A"},
+      {name:"Keller Clayton", id:8479343, pos:"A"},
+      {name:"Guenther Dylan", id:8482699, pos:"A"},
+      {name:"Wilson Tom", id:8476880, pos:"A"},
+      {name:"Protas Aleksei", id:8481656, pos:"A"},
     ]
   },
   {
     dg: "Zack Lagace",
     nhl: "Vegas Golden Knights",
     players: [
-      {name:"Blackwood Mackenzie", id:8480762, pos:"G"},
-      {name:"Raddysh Darren", id:8480795, pos:"D"},
-      {name:"Weegar Mackenzie", id:8479436, pos:"D"},
-      {name:"Byram Bowen", id:8482071, pos:"D"},
+      {name:"Blackwood Mackenzie", id:8478406, pos:"G"},
+      {name:"Raddysh Darren", id:8478178, pos:"D"},
+      {name:"Weegar Mackenzie", id:8477346, pos:"D"},
+      {name:"Byram Bowen", id:8481524, pos:"D"},
       {name:"Moser J.J.", id:8482655, pos:"D"},
       {name:"Pettersen Elias", id:8480012, pos:"A"},
       {name:"Rantanen Mikko", id:8478493, pos:"A"},
-      {name:"Stone Mark", id:8475188, pos:"A"},
+      {name:"Stone Mark", id:8475913, pos:"A"},
       {name:"Larkin Dylan", id:8477946, pos:"A"},
-      {name:"Hintz Roope", id:8478997, pos:"A"},
+      {name:"Hintz Roope", id:8478449, pos:"A"},
       {name:"Horvat Bo", id:8477500, pos:"A"},
-      {name:"Batherson Drake", id:8481533, pos:"A"},
+      {name:"Batherson Drake", id:8480208, pos:"A"},
       {name:"Bratt Jesper", id:8479407, pos:"A"},
-      {name:"Byfield Quinton", id:8482074, pos:"A"},
-      {name:"Evangelista Luke", id:8483533, pos:"A"},
-      {name:"Johnson Kent", id:8482553, pos:"A"},
+      {name:"Byfield Quinton", id:8482124, pos:"A"},
+      {name:"Evangelista Luke", id:8482146, pos:"A"},
+      {name:"Johnson Kent", id:8482660, pos:"A"},
       {name:"Barkov Alexander", id:8477493, pos:"A"},
-      {name:"Tkachuk Matthew", id:8480801, pos:"A"},
-      {name:"Doan Josh", id:8483548, pos:"A"},
+      {name:"Tkachuk Matthew", id:8479314, pos:"A"},
+      {name:"Doan Josh", id:8482659, pos:"A"},
     ]
   }
 ];
-
-// ─── REAL NHL PLAYER IDs (corrected known IDs) ─────────────────────────────
-const REAL_IDS = {
-  "McDavid Connor": 8478402,
-  "Draisaitl Leon": 8477934,
-  "Crosby Sidney": 8471675,
-  "Ovechkin Alex": 8471214,
-  "MacKinnon Nathan": 8477492,
-  "Kucherov Nikita": 8476453,
-  "Panarin Artemi": 8478550,
-  "Marner Mitchell": 8478483,
-  "Nylander William": 8477939,
-  "Matthews Auston": 8479318,
-  "Rantanen Mikko": 8478493,
-  "Eichel Jack": 8478403,
-  "Point Braydon": 8478010,
-  "Pastrnak David": 8477956,
-  "Kaprizov Kirill": 8481600,
-  "Connor Kyle": 8478550,
-  "Forsberg Filip": 8476887,
-  "Scheifele Mark": 8475716,
-  "Fox Adam": 8479323,
-  "Makar Cale": 8480069,
-  "Oettinger Jake": 8480045,
-  "Hughes Quinn": 8480800,
-  "Barzal Matthew": 8480768,
-  "Aho Sebastian": 8478427,
-  "Heiskanen Miro": 8480764,
-  "Hughes Jack": 8481559,
-  "Hedman Victor": 8475167,
-  "Josi Roman": 8474870,
-  "Dahlin Rasmus": 8480787,
-  "Karlsson Erik": 8474578,
-  "Malkin Evgeny": 8471215,
-  "Marchand Brad": 8473419,
-  "Tavares John": 8475154,
-  "Burns Brent": 8470771,
-  "Duchene Matt": 8474565,
-  "Faulk Justin": 8475784,
-  "Strome Dylan": 8477951,
-  "Guentzel Jake": 8476434,
-  "O'Reilly Ryan": 8475158,
-  "Nugent-Hopkins Ryan": 8475793,
-  "Johansson Marcus": 8475765,
-  "Wilson Tom": 8475831,
-  "Rust Bryan": 8476792,
-  "Schmaltz Nick": 8477411,
-  "Lehkonen Artturi": 8478476,
-  "Reinhart Sam": 8477933,
-  "McAvoy Charlie": 8480794,
-  "Suzuki Nick": 8480785,
-  "Jarvis Seth": 8482179,
-  "Montour Brandon": 8477353,
-  "Chabot Thomas": 8479977,
-  "Ekman-Larsson Oliver": 8474579,
-  "Ekholm Mattias": 8475218,
-  "Dobson Noah": 8480762,
-  "Theodore Shea": 8478476,
-  "Seider Moritz": 8482476,
-  "Marino John": 8480048,
-  "Forsling Gustav": 8478009,
-  "Morrissey Josh": 8476454,
-  "Weegar Mackenzie": 8479436,
-  "Hamilton Dougie": 8476456,
-  "Chychrun Jakob": 8479458,
-  "Rielly Morgan": 8476432,
-  "Byram Bowen": 8482071,
-  "Dunn Vince": 8478420,
-  "Matheson Mike": 8477441,
-  "Manson Josh": 8476436,
-  "Sergachev Mikhail": 8480315,
-  "Konecny Travis": 8478445,
-  "Thompson Tage": 8480801,
-  "Keller Clayton": 8479365,
-  "Stone Mark": 8475188,
-  "Larkin Dylan": 8477946,
-  "Hintz Roope": 8478997,
-  "Horvat Bo": 8477500,
-  "Pettersen Elias": 8480012,
-  "Bratt Jesper": 8479407,
-  "Barkov Alexander": 8477493,
-  "Rakell Ricard": 8476454,
-  "Guenther Dylan": 8483604,
-  "Stankoven Logan": 8483604,
-  "Raymond Lucas": 8482078,
-  "Beniers Matthew": 8482665,
-  "Boldy Matthew": 8481533,
-  "Svechnikov Andrei": 8480830,
-  "Holloway Dylan": 8482074,
-  "McTavish Mason": 8483533,
-  "Johnston Wyatt": 8482749,
-  "Hughes Quinton": 8480800,
-  "Harley Thomas": 8481533,
-  "Sanderson Jake": 8482553,
-  "Hughes Luke": 8483476,
-  "Stützle Tim": 8482116,
-  "Slafkovsky Juraj": 8483457,
-  "Caufield Cole": 8481600,
-  "Hischier Nico": 8480762,
-  "Knies Matthew": 8483457,
-  "Byfield Quinton": 8482074,
-  "Doan Josh": 8483548,
-  "Cooley Logan": 8483492,
-  "Hagel Brandon": 8480795,
-  "Wolf Dustin": 8482481,
-  "Thompson Logan": 8481554,
-  "Gustavsson Filip": 8479406,
-  "Hutson Lane": 8483457,
-  "Hronek Filip": 8479425,
-  "Samuelsson Mathias": 8480807,
-  "Spence Jordan": 8481606,
-  "Robertson Jason": 8480027,
-};
-
-// Patch real IDs into teams
-PTS_TEAMS.forEach(team => {
-  team.players.forEach(p => {
-    if (REAL_IDS[p.name]) p.id = REAL_IDS[p.name];
-  });
-});
 
 // ─── CACHE ──────────────────────────────────────────────────────────────────
 const statsCache = {};
 const SEASON = "20252026"; // Saison passée — sera changé pour 20262027 quand la nouvelle saison commence
 
-// Plusieurs proxys CORS de secours : si le premier échoue (limite atteinte,
-// origine bloquée, etc.), on essaie automatiquement le suivant.
 const CORS_PROXIES = [
   url => `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
   url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
   url => `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(url)}`,
 ];
 
-// Un proxy gratuit qui ne répond jamais bloquerait fetch() indéfiniment
-// (pas de timeout par défaut). On force donc un abandon après quelques
-// secondes pour passer automatiquement au proxy suivant.
 async function fetchWithTimeout(url, ms) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), ms);
@@ -1291,14 +979,12 @@ async function fetchJsonViaProxy(targetUrl) {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.json();
     } catch (e) {
-      lastErr = e; // essaie le proxy suivant
+      lastErr = e;
     }
   }
   throw lastErr || new Error('Tous les proxys ont échoué');
 }
 
-// Traite une liste d'éléments avec un nombre limité de requêtes en parallèle
-// (évite de se faire bloquer par les limites de débit des proxys gratuits).
 async function runWithConcurrency(items, limit, worker) {
   const results = new Array(items.length);
   let idx = 0;
@@ -1319,7 +1005,6 @@ async function fetchPlayerStats(playerId) {
     const url = `https://api-web.nhle.com/v1/player/${playerId}/landing`;
     const data = await fetchJsonViaProxy(url);
     
-    // Find current season stats
     const pos = data.position;
     let stats = null;
     
@@ -1380,8 +1065,6 @@ function calcTeamScore(playerStats) {
 }
 
 // ─── POINTS RÉELS DES ÉQUIPES LNH (classement général) ──────────────────────
-// Date choisie: fin de la saison régulière 2025-26 (dernière saison complétée),
-// pour obtenir le classement final (points) de chaque franchise LNH.
 const STANDINGS_DATE = "2026-04-17";
 let nhlTeamPoints = {};
 
@@ -1420,8 +1103,6 @@ async function loadAllPlayerStats() {
     const total = PTS_TEAMS.reduce((s,t) => s + t.players.length, 0);
     statusText.textContent = `Chargement des statistiques (0/${total} joueurs)…`;
 
-    // Chaque joueur, de toutes les équipes, avec un maximum de 8 requêtes
-    // en parallèle à la fois (assez rapide, sans se faire bloquer par les proxys).
     const allPlayers = [];
     PTS_TEAMS.forEach(team => {
       team.players.forEach(player => allPlayers.push({ team, player }));
@@ -1452,8 +1133,6 @@ async function loadAllPlayerStats() {
       ? `✅ Stats mises à jour — ${actifs} joueurs actifs`
       : `⚠️ Stats chargées, mais aucune donnée reçue de l'API LNH (proxys probablement indisponibles). Réessayez avec 🔄 Actualiser.`;
   } catch (e) {
-    // Filet de sécurité : même en cas d'erreur imprévue, on ne reste jamais
-    // bloqué sur "Chargement…" indéfiniment.
     tbody.innerHTML = '<tr><td colspan="10" style="padding:40px;text-align:center;color:#dc2626">❌ Impossible de charger le classement (problème réseau ou proxy). Cliquez sur 🔄 Actualiser pour réessayer.</td></tr>';
     statusText.textContent = `❌ Échec du chargement — réessayez avec 🔄 Actualiser`;
   } finally {
@@ -1494,7 +1173,6 @@ function renderStandings() {
     tr.onclick = () => toggleBreakdown(r, tr, i);
     tbody.appendChild(tr);
 
-    // breakdown row (hidden by default)
     const btr = document.createElement('tr');
     btr.className = 'breakdown-panel';
     btr.id = `breakdown-${i}`;
@@ -1543,15 +1221,66 @@ function buildBreakdown(r) {
   html += '</div>';
   return html;
 }
-
-// Auto-load on page open
-
 </script>
 
-<!-- ═══════════════════════════════════════════════════════════
-     TICKER + CHAT STYLES
-════════════════════════════════════════════════════════════ -->
 <style>
+.standings-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.standings-table thead { background: #f8fafc; }
+.standings-table th {
+  padding: 12px 14px; text-align: center; font-size: 11px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase; color: #94a3b8;
+  border-bottom: 2px solid #e2e8f0; white-space: nowrap;
+}
+.standings-table th.left { text-align: left; }
+.standings-table td { padding: 13px 14px; border-bottom: 1px solid #f1f5f9; text-align: center; vertical-align: middle; }
+.standings-table td.left { text-align: left; }
+.standings-table tbody tr:not(.breakdown-panel) { cursor: pointer; transition: background 0.15s; }
+.standings-table tbody tr:not(.breakdown-panel):hover td { background: #f0f7ff; }
+
+.rank-cell { font-size: 20px; font-weight: 900; color: #cbd5e1; min-width: 36px; display:inline-block; }
+.rank-cell.r1 { color: #f59e0b; }
+.rank-cell.r2 { color: #94a3b8; }
+.rank-cell.r3 { color: #b45309; }
+
+.participant-cell { display: flex; flex-direction: column; }
+.p-name { font-weight: 700; font-size: 15px; color: #1e293b; }
+.p-nhl { font-size: 11px; color: #94a3b8; font-weight: 500; margin-top: 1px; }
+
+.pts-cell { font-size: 18px; font-weight: 800; color: #1e40af; }
+.stat-cell { font-size: 14px; font-weight: 600; color: #334155; }
+.diff-cell { font-size: 13px; font-weight: 700; }
+.diff-cell.neg { color: #dc2626; }
+.diff-cell.zero { color: #16a34a; }
+.pj-cell, .ppj-cell { font-size: 13px; color: #64748b; }
+
+.breakdown-panel { display: none; background: #f8fafc; }
+.breakdown-panel.open { display: table-row; }
+.breakdown-panel td { text-align: left; cursor: default; }
+.breakdown-inner { padding: 16px 20px; }
+.breakdown-title {
+  font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  color: #2563eb; margin-bottom: 12px; margin-top: 18px;
+}
+.breakdown-title:first-child { margin-top: 0; }
+.player-rows {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.player-row {
+  background: #fff; border: 1px solid #e2e8f0; border-radius: 8px;
+  padding: 8px 12px; display: flex; justify-content: space-between; align-items: center;
+}
+.player-row.best { border-color: #93c5fd; background: #eff6ff; }
+.pr-name { font-size: 12px; font-weight: 600; color: #1e293b; display: flex; align-items: center; }
+.pr-pts { font-size: 14px; font-weight: 800; color: #1e40af; flex-shrink: 0; margin-left: 8px; }
+.pr-detail { font-size: 10px; color: #94a3b8; margin-top: 2px; }
+.pos-label {
+  font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px;
+  margin-right: 6px; flex-shrink: 0;
+}
+
 /* ── TICKER ── */
 .ticker-wrap {
   background: #0f172a;
@@ -1815,70 +1544,8 @@ function buildBreakdown(r) {
   .admin-panel { width: calc(100vw - 32px); left: 16px; }
   .admin-toggle { left: 16px; bottom: 16px; }
 }
-
-/* ── CLASSEMENT PAR POINTS — Breakdown détail joueurs ── */
-.standings-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-.standings-table thead { background: #f8fafc; }
-.standings-table th {
-  padding: 12px 14px; text-align: center; font-size: 11px; font-weight: 700;
-  letter-spacing: 1px; text-transform: uppercase; color: #94a3b8;
-  border-bottom: 2px solid #e2e8f0; white-space: nowrap;
-}
-.standings-table th.left { text-align: left; }
-.standings-table td { padding: 13px 14px; border-bottom: 1px solid #f1f5f9; text-align: center; vertical-align: middle; }
-.standings-table td.left { text-align: left; }
-.standings-table tbody tr:not(.breakdown-panel) { cursor: pointer; transition: background 0.15s; }
-.standings-table tbody tr:not(.breakdown-panel):hover td { background: #f0f7ff; }
-
-.rank-cell { font-size: 20px; font-weight: 900; color: #cbd5e1; min-width: 36px; display:inline-block; }
-.rank-cell.r1 { color: #f59e0b; }
-.rank-cell.r2 { color: #94a3b8; }
-.rank-cell.r3 { color: #b45309; }
-
-.participant-cell { display: flex; flex-direction: column; }
-.p-name { font-weight: 700; font-size: 15px; color: #1e293b; }
-.p-nhl { font-size: 11px; color: #94a3b8; font-weight: 500; margin-top: 1px; }
-
-.pts-cell { font-size: 18px; font-weight: 800; color: #1e40af; }
-.stat-cell { font-size: 14px; font-weight: 600; color: #334155; }
-.diff-cell { font-size: 13px; font-weight: 700; }
-.diff-cell.neg { color: #dc2626; }
-.diff-cell.zero { color: #16a34a; }
-.pj-cell, .ppj-cell { font-size: 13px; color: #64748b; }
-
-.breakdown-panel { display: none; background: #f8fafc; }
-.breakdown-panel.open { display: table-row; }
-.breakdown-panel td { text-align: left; cursor: default; }
-.breakdown-inner { padding: 16px 20px; }
-.breakdown-title {
-  font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
-  color: #2563eb; margin-bottom: 12px; margin-top: 18px;
-}
-.breakdown-title:first-child { margin-top: 0; }
-.player-rows {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 8px;
-  margin-bottom: 4px;
-}
-.player-row {
-  background: #fff; border: 1px solid #e2e8f0; border-radius: 8px;
-  padding: 8px 12px; display: flex; justify-content: space-between; align-items: center;
-}
-.player-row.best { border-color: #93c5fd; background: #eff6ff; }
-.pr-name { font-size: 12px; font-weight: 600; color: #1e293b; display: flex; align-items: center; }
-.pr-pts { font-size: 14px; font-weight: 800; color: #1e40af; flex-shrink: 0; margin-left: 8px; }
-.pr-detail { font-size: 10px; color: #94a3b8; margin-top: 2px; }
-.pos-label {
-  font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px;
-  margin-right: 6px; flex-shrink: 0;
-}
 </style>
 
-<!-- ═══════════════════════════════════════════════════════════
-     TICKER HTML (just below header, before nav)
-     Injected via JS below
-════════════════════════════════════════════════════════════ -->
 <div class="ticker-wrap" id="ticker-wrap">
   <div class="ticker-label">📅 Prochains événements</div>
   <div style="overflow:hidden;flex:1">
@@ -1888,9 +1555,6 @@ function buildBreakdown(r) {
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════
-     CHAT PANEL
-════════════════════════════════════════════════════════════ -->
 <button class="chat-bubble-btn" onclick="toggleChat()" title="Chat des DG">
   💬
   <span class="chat-badge" id="chat-badge">0</span>
@@ -1919,9 +1583,6 @@ function buildBreakdown(r) {
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════
-     ADMIN PANEL (Eric only)
-════════════════════════════════════════════════════════════ -->
 <button class="admin-toggle" id="admin-toggle" onclick="toggleAdmin()">⚙️ Admin</button>
 
 <div class="admin-panel" id="admin-panel">
@@ -1958,40 +1619,33 @@ function buildBreakdown(r) {
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════
-     FIREBASE + CHAT + TICKER LOGIC
-════════════════════════════════════════════════════════════ -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push, onValue, remove, serverTimestamp }
+import { getDatabase, ref, push, onValue, set, get, remove, serverTimestamp }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-// ── Firebase config (free Realtime Database) ──
 const firebaseConfig = {
-  apiKey: "AIzaSyDemo-PoolHockey-Replace-With-Real",
-  authDomain: "pool-hockey-demo.firebaseapp.com",
-  databaseURL: "https://pool-hockey-demo-default-rtdb.firebaseio.com",
-  projectId: "pool-hockey-demo",
-  storageBucket: "pool-hockey-demo.appspot.com",
-  messagingSenderId: "000000000000",
-  appId: "1:000000000000:web:0000000000000000"
+  apiKey: "AIzaSyAxozedQvOL7Jt-HFCCPZfOQW1Oa8lOmys",
+  authDomain: "pool334-a08dc.firebaseapp.com",
+  databaseURL: "https://pool334-a08dc-default-rtdb.firebaseio.com",
+  projectId: "pool334-a08dc",
+  storageBucket: "pool334-a08dc.firebasestorage.app",
+  messagingSenderId: "753279257158",
+  appId: "1:753279257158:web:9927ab44c03b179e31d847"
 };
 
-// ─── FALLBACK: localStorage-based chat (works without Firebase) ───────────
-// We'll use localStorage so it works immediately without Firebase setup
-// Messages will persist per browser — good enough for testing
+const fbApp = initializeApp(firebaseConfig);
+const db = getDatabase(fbApp);
 
-const ADMIN_NAME = "Eric Turgeon";  // ← ton nom exact
-const ADMIN_KEY  = "poolhockey2627commissaire"; // mot de passe admin simple
+const ADMIN_NAME = "Eric Turgeon";
+const ADMIN_KEY  = "poolhockey2627commissaire";
 
-// ── NAME ──
 const nameInput = document.getElementById('chat-username');
 const savedName = localStorage.getItem('pool-chat-name') || '';
 nameInput.value = savedName;
 
 window.saveName = function() {
   localStorage.setItem('pool-chat-name', nameInput.value.trim());
-  // Show admin button if name matches
   checkAdmin();
 };
 
@@ -2002,20 +1656,42 @@ function checkAdmin() {
 }
 checkAdmin();
 
-// ── MESSAGES (localStorage) ──
-function getMessages() {
-  try { return JSON.parse(localStorage.getItem('pool-chat-msgs') || '[]'); }
-  catch { return []; }
-}
-function saveMessages(msgs) {
-  // Keep last 200 messages
-  if (msgs.length > 200) msgs = msgs.slice(-200);
-  localStorage.setItem('pool-chat-msgs', JSON.stringify(msgs));
-}
-
-let lastCount = getMessages().length;
+const chatRef = ref(db, 'chatMessages');
+let chatMessagesCache = [];
 let chatOpen = false;
 let unread = 0;
+let chatLastCount = 0;
+let chatInitialLoad = true;
+
+onValue(chatRef, (snapshot) => {
+  const msgs = [];
+  snapshot.forEach(child => msgs.push(child.val()));
+  chatMessagesCache = msgs;
+
+  if (chatInitialLoad) {
+    chatLastCount = msgs.length;
+    chatInitialLoad = false;
+  } else if (msgs.length > chatLastCount) {
+    if (!chatOpen) {
+      unread += msgs.length - chatLastCount;
+      const badge = document.getElementById('chat-badge');
+      if (badge) {
+        badge.textContent = unread > 9 ? '9+' : unread;
+        badge.style.display = 'flex';
+      }
+    }
+    chatLastCount = msgs.length;
+  } else {
+    chatLastCount = msgs.length;
+  }
+  renderMessages();
+}, (err) => {
+  console.error('Firebase chatMessages error:', err);
+});
+
+function getMessages() {
+  return chatMessagesCache;
+}
 
 function renderMessages() {
   const msgs = getMessages();
@@ -2056,33 +1732,38 @@ function escapeHtml(t) {
   return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-window.sendMessage = function() {
+window.sendMessage = async function() {
   const input = document.getElementById('chat-input');
   const text = input.value.trim();
   const name = nameInput.value.trim();
   if (!text) return;
   if (!name) { nameInput.focus(); nameInput.style.borderColor='#ef4444'; return; }
   nameInput.style.borderColor='';
-
-  const msgs = getMessages();
-  msgs.push({ name, text, ts: Date.now(), type: 'chat' });
-  saveMessages(msgs);
   input.value = '';
   input.style.height = 'auto';
-  renderMessages();
+
+  try {
+    await push(chatRef, { name, text, ts: Date.now(), type: 'chat' });
+  } catch (e) {
+    console.error('Erreur envoi message (Firebase):', e);
+    alert("⚠️ Le message n'a pas pu être envoyé (connexion). Réessaie.");
+  }
 };
 
-window.sendAdminMessage = function() {
+window.sendAdminMessage = async function() {
   const input = document.getElementById('admin-msg-input');
   const text = input.value.trim();
   if (!text) return;
-  const msgs = getMessages();
-  msgs.push({ name: ADMIN_NAME, text, ts: Date.now(), type: 'system' });
-  saveMessages(msgs);
   input.value = '';
-  renderMessages();
-  document.getElementById('admin-status').textContent = '✅ Annonce envoyée!';
-  setTimeout(() => document.getElementById('admin-status').textContent = '', 2000);
+
+  try {
+    await push(chatRef, { name: ADMIN_NAME, text, ts: Date.now(), type: 'system' });
+    document.getElementById('admin-status').textContent = '✅ Annonce envoyée!';
+  } catch (e) {
+    console.error('Erreur envoi annonce (Firebase):', e);
+    document.getElementById('admin-status').textContent = "⚠️ Échec de l'envoi (connexion)";
+  }
+  setTimeout(() => document.getElementById('admin-status').textContent = '', 2500);
 };
 
 window.autoResize = function(el) {
@@ -2109,43 +1790,37 @@ window.toggleAdmin = function() {
   document.getElementById('admin-panel').classList.toggle('open');
 };
 
-// Poll for new messages every 5s
-setInterval(() => {
-  const msgs = getMessages();
-  if (msgs.length > lastCount) {
-    if (!chatOpen) {
-      unread += msgs.length - lastCount;
-      const badge = document.getElementById('chat-badge');
-      badge.textContent = unread > 9 ? '9+' : unread;
-      badge.style.display = 'flex';
-    } else {
-      renderMessages();
-    }
-    lastCount = msgs.length;
+const eventsRef = ref(db, 'events');
+let eventsCache = [];
+let eventsInitialLoad = true;
+
+onValue(eventsRef, async (snapshot) => {
+  const raw = snapshot.val();
+
+  if (raw === null && eventsInitialLoad) {
+    eventsInitialLoad = false;
+    const defaults = [
+      { title: "Soirée de signatures #1", date: "2026-12-05", desc: "Début décembre — ordre inverse au classement" },
+      { title: "Date limite LNH", date: "2027-03-07", desc: "Soirée de signatures #2" },
+      { title: "Début des séries éliminatoires", date: "2027-04-19", desc: "Choix de la 2e équipe NHL" },
+      { title: "Draft agents libres", date: "2027-07-01", desc: "Début de la prochaine saison" },
+    ];
+    try { await set(eventsRef, defaults); } catch (e) { console.error('Erreur seed events:', e); }
+    return;
   }
-}, 3000);
 
-// ── EVENTS / TICKER ──
+  eventsInitialLoad = false;
+  eventsCache = Array.isArray(raw) ? raw.filter(Boolean)
+    : (raw && typeof raw === 'object') ? Object.values(raw).filter(Boolean)
+    : [];
+  renderTicker();
+}, (err) => {
+  console.error('Firebase events error:', err);
+});
+
 function getEvents() {
-  try { return JSON.parse(localStorage.getItem('pool-events') || '[]'); }
-  catch { return []; }
+  return eventsCache;
 }
-function saveEvents(evts) {
-  localStorage.setItem('pool-events', JSON.stringify(evts));
-}
-
-// Default events (Eric can replace)
-function initDefaultEvents() {
-  if (localStorage.getItem('pool-events')) return;
-  const defaults = [
-    { title: "Soirée de signatures #1", date: "2026-12-05", desc: "Début décembre — ordre inverse au classement" },
-    { title: "Date limite LNH", date: "2027-03-07", desc: "Soirée de signatures #2" },
-    { title: "Début des séries éliminatoires", date: "2027-04-19", desc: "Choix de la 2e équipe NHL" },
-    { title: "Draft agents libres", date: "2027-07-01", desc: "Début de la prochaine saison" },
-  ];
-  saveEvents(defaults);
-}
-initDefaultEvents();
 
 function renderTicker() {
   const evts = getEvents();
@@ -2155,11 +1830,9 @@ function renderTicker() {
     return;
   }
 
-  // Sort by date
   const sorted = [...evts].sort((a,b) => new Date(a.date) - new Date(b.date));
   const now = new Date();
 
-  // Build items (duplicate for seamless loop)
   let items = sorted.map(e => {
     const d = new Date(e.date);
     const diff = Math.ceil((d - now) / (1000*60*60*24));
@@ -2173,11 +1846,10 @@ function renderTicker() {
       ${e.desc ? `<span style="color:#cbd5e1;font-size:11px">— ${e.desc}</span>` : ''}
     </div>`;
   }).join('');
-  // Duplicate for seamless loop
   track.innerHTML = items + items;
 }
 
-window.addEvent = function() {
+window.addEvent = async function() {
   const title = document.getElementById('event-title').value.trim();
   const date  = document.getElementById('event-date').value;
   const desc  = document.getElementById('event-desc').value.trim();
@@ -2185,25 +1857,31 @@ window.addEvent = function() {
     document.getElementById('admin-status').textContent = '⚠️ Titre et date requis';
     return;
   }
-  const evts = getEvents();
-  evts.push({ title, date, desc });
-  saveEvents(evts);
+  const updated = [...eventsCache, { title, date, desc }];
   document.getElementById('event-title').value = '';
   document.getElementById('event-date').value = '';
   document.getElementById('event-desc').value = '';
-  renderTicker();
-  document.getElementById('admin-status').textContent = '✅ Événement ajouté!';
+  try {
+    await set(eventsRef, updated);
+    document.getElementById('admin-status').textContent = '✅ Événement ajouté!';
+  } catch (e) {
+    console.error('Erreur ajout événement (Firebase):', e);
+    document.getElementById('admin-status').textContent = "⚠️ Échec de l'ajout (connexion)";
+  }
   setTimeout(() => document.getElementById('admin-status').textContent = '', 2000);
 };
 
-window.clearEvents = function() {
+window.clearEvents = async function() {
   if (!confirm('Effacer tous les événements?')) return;
-  localStorage.removeItem('pool-events');
-  renderTicker();
-  document.getElementById('admin-status').textContent = '🗑 Effacé';
+  try {
+    await remove(eventsRef);
+    document.getElementById('admin-status').textContent = '🗑 Effacé';
+  } catch (e) {
+    console.error('Erreur suppression événements (Firebase):', e);
+    document.getElementById('admin-status').textContent = '⚠️ Échec de la suppression';
+  }
 };
 
-// Move ticker above nav
 const tickerWrap = document.getElementById('ticker-wrap');
 const nav = document.querySelector('.nav-bar');
 if (nav) nav.parentNode.insertBefore(tickerWrap, nav);
